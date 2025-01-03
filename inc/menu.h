@@ -13,6 +13,7 @@ void initAllMenus(MenuHandle mainMenu);
 void mainMenuLoop(MenuHandle menuHandle);
 void subMenu1Loop(MenuHandle menuHandle);
 void subMenu2Loop(MenuHandle menuHandle);
+void subMenu3Loop(MenuHandle menuHandle);
 
 // Display functions
 void displayMenuItem(MenuItemHandle menuItemHandle);

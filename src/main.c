@@ -2,12 +2,14 @@
 #include "simpleCMenu.h"
 #include "menu.h"
 
-
 int main(void)
 {
     initMenuDisplayFunctions(displayMenuItem, displaySelectedMenuItem, goToxy);
 
-    MenuHandle mainMenu = initMenu(mainMenuLoop);
+    const char *topMenuInfo = "实验室预约信息管理系统";
+    const char *bottomMenuInfo = "";
+
+    MenuHandle mainMenu = initMenu(mainMenuLoop, topMenuInfo, bottomMenuInfo);
 
     initAllMenus(mainMenu);
 
@@ -15,6 +17,3 @@ int main(void)
 
     return 0;
 }
-
-
-

@@ -45,6 +45,12 @@ typedef struct
     LabReservationList labReservation;
 } Lab; // 实验室结构体
 
+typedef struct LabNode
+{
+    Lab lab;
+    struct LabNode *next;
+} LabNode, *LabList; // 实验室链表结构体
+
 /* 实验室功能 */
 // 添加实验室
 Status addLab();
