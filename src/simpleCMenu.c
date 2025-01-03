@@ -14,7 +14,7 @@ char getSelectedMenuItemTag()
 void changeCurrentMenu()
 {
     if (currentMenuHandle == NULL)
-        return NULL;
+        return ;
     switch (currentMenuHandle->selectedMenuItemHandle->type)
     {
     case ENTER_MENU_TYPE:

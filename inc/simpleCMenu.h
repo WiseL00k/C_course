@@ -15,84 +15,84 @@ typedef enum
 
 typedef struct Menu *MenuHandle;
 
-// èœå•é¡¹åŠ¨ä½œå‚æ•° ç”¨æˆ·å¯è‡ªè¡Œæ·»åŠ æ›´æ”¹ä¸åŒçš„å‚æ•°ç±»å‹
+// ²Ëµ¥Ïî¶¯×÷²ÎÊı ÓÃ»§¿É×ÔĞĞÌí¼Ó¸ü¸Ä²»Í¬µÄ²ÎÊıÀàĞÍ
 typedef struct ActionArgs
 {
-    int num;         // ç¬¬ä¸€ä¸ªå‚æ•°ï¼šæ•´æ•°
-    const char *str; // ç¬¬äºŒä¸ªå‚æ•°ï¼šå­—ç¬¦ä¸²
+    int num;         // µÚÒ»¸ö²ÎÊı£ºÕûÊı
+    const char *str; // µÚ¶ş¸ö²ÎÊı£º×Ö·û´®
 } ActionArgs;
 
-// èœå•é¡¹
+// ²Ëµ¥Ïî
 typedef struct MenuItem
 {
-    MenuItemType type; // èœå•é¡¹ç±»å‹
-    char *name;        // èœå•é¡¹åç§°
-    char tag;          // èœå•é¡¹æ ‡ç­¾
+    MenuItemType type; // ²Ëµ¥ÏîÀàĞÍ
+    char *name;        // ²Ëµ¥ÏîÃû³Æ
+    char tag;          // ²Ëµ¥Ïî±êÇ©
     struct
     {
-        int x; // åˆ—
-        int y; // è¡Œ
-    } pos;     // èœå•é¡¹åæ ‡
+        int x; // ÁĞ
+        int y; // ĞĞ
+    } pos;     // ²Ëµ¥Ïî×ø±ê
     union
     {
-        // ç±»å‹ä¸ºCHANGE_MENU_TYPEæ‰æœ¬é¡¹æœ‰æ„ä¹‰
+        // ÀàĞÍÎªCHANGE_MENU_TYPE²Å±¾ÏîÓĞÒâÒå
         struct
         {
             void (*enterMenuAction)(struct MenuItem *);
 
-            MenuHandle nextMenu; // ä¸‹ä¸€çº§èœå•
+            MenuHandle nextMenu; // ÏÂÒ»¼¶²Ëµ¥
         } enter;
 
         struct
         {
             void (*exitMenuAction)(struct MenuItem *);
-            MenuHandle prevMenu; // ä¸Šä¸€çº§èœå•
+            MenuHandle prevMenu; // ÉÏÒ»¼¶²Ëµ¥
         } exit;
 
     } un;
 
-    struct MenuItem *prevItem; // ä¸Šä¸€ä¸ªèœå•é¡¹
-    struct MenuItem *nextItem; // ä¸‹ä¸€ä¸ªèœå•é¡¹
+    struct MenuItem *prevItem; // ÉÏÒ»¸ö²Ëµ¥Ïî
+    struct MenuItem *nextItem; // ÏÂÒ»¸ö²Ëµ¥Ïî
 } MenuItem, *MenuItemHandle;
 
 typedef struct MenuItemList
 {
-    MenuItem *head; // èœå•é¡¹å¤´
-    MenuItem *tail; // èœå•é¡¹å°¾
-    int count;      // èœå•é¡¹æ•°é‡
+    MenuItem *head; // ²Ëµ¥ÏîÍ·
+    MenuItem *tail; // ²Ëµ¥ÏîÎ²
+    int count;      // ²Ëµ¥ÏîÊıÁ¿
 } MenuItemList, *MenuItemListHandle;
 
-// èœå•
+// ²Ëµ¥
 typedef struct Menu
 {
     struct
     {
-        int x;        // åˆ—
-        int y;        // è¡Œ
-    } topMenuInfoPos; // é¡¶éƒ¨èœå•ä¿¡æ¯è¡Œåæ ‡
+        int x;        // ÁĞ
+        int y;        // ĞĞ
+    } topMenuInfoPos; // ¶¥²¿²Ëµ¥ĞÅÏ¢ĞĞ×ø±ê
     struct
     {
-        int x;           // åˆ—
-        int y;           // è¡Œ
-    } bottomMenuInfoPos; // åº•éƒ¨èœå•ä¿¡æ¯è¡Œ
+        int x;           // ÁĞ
+        int y;           // ĞĞ
+    } bottomMenuInfoPos; // µ×²¿²Ëµ¥ĞÅÏ¢ĞĞ
 
-    MenuItemList *menuItemListHandle;      // èœå•é¡¹åˆ—è¡¨
-    MenuItemHandle selectedMenuItemHandle; // å½“å‰é€‰ä¸­çš„èœå•é¡¹
-    char selectedMenuItemTag;              // å½“å‰é€‰ä¸­çš„èœå•é¡¹æ ‡ç­¾
-    void (*loop)(MenuHandle);              // èœå•å¾ªç¯å‡½æ•°
+    MenuItemList *menuItemListHandle;      // ²Ëµ¥ÏîÁĞ±í
+    MenuItemHandle selectedMenuItemHandle; // µ±Ç°Ñ¡ÖĞµÄ²Ëµ¥Ïî
+    char selectedMenuItemTag;              // µ±Ç°Ñ¡ÖĞµÄ²Ëµ¥Ïî±êÇ©
+    void (*loop)(MenuHandle);              // ²Ëµ¥Ñ­»·º¯Êı
 } Menu, *MenuHandle;
 
 typedef struct
 {
-    void (*displayMenuItem)(MenuItemHandle);         // æ˜¾ç¤ºèœå•é¡¹
-    void (*displaySelectedMenuItem)(MenuItemHandle); // æ˜¾ç¤ºå½“å‰é€‰ä¸­çš„èœå•é¡¹
-    void (*moveCursor)(int x, int y);                // ç§»åŠ¨å…‰æ ‡
+    void (*displayMenuItem)(MenuItemHandle);         // ÏÔÊ¾²Ëµ¥Ïî
+    void (*displaySelectedMenuItem)(MenuItemHandle); // ÏÔÊ¾µ±Ç°Ñ¡ÖĞµÄ²Ëµ¥Ïî
+    void (*moveCursor)(int x, int y);                // ÒÆ¶¯¹â±ê
 } MenuDisplayFunctions;
 
-/* åˆå§‹åŒ–èœå•é¡¹
- * @param name èœå•é¡¹åç§°
- * @param type èœå•é¡¹ç±»å‹
- * @param action èœå•é¡¹åŠ¨ä½œ, å½“èœå•é¡¹ç±»å‹ä¸ºEXECUTIVE_FUNCTION_TYPEæ—¶æœ‰æ•ˆ, å¦åˆ™ä¸ºNULL
+/* ³õÊ¼»¯²Ëµ¥Ïî
+ * @param name ²Ëµ¥ÏîÃû³Æ
+ * @param type ²Ëµ¥ÏîÀàĞÍ
+ * @param action ²Ëµ¥Ïî¶¯×÷, µ±²Ëµ¥ÏîÀàĞÍÎªEXECUTIVE_FUNCTION_TYPEÊ±ÓĞĞ§, ·ñÔòÎªNULL
  */
 MenuItemHandle initExecFuncMenuItem(const char *name);
 MenuItemHandle initChangeMenuItem(const char *name, MenuItemType type, MenuHandle menuHandle);

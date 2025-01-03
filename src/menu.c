@@ -11,8 +11,8 @@ void quit()
 void goToxy(int x, int y)
 {
     COORD pos = {x, y};
-    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE); // 获取标准输出设备句柄
-    SetConsoleCursorPosition(hOut, pos);           // 两个参数分别是指定哪个窗体，具体位置
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleCursorPosition(hOut, pos);           
 }
 
 void displayMenuItem(MenuItemHandle menuItemHandle)
@@ -30,7 +30,7 @@ void hideCursor()
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO cursorInfo;
     GetConsoleCursorInfo(hConsole, &cursorInfo);
-    cursorInfo.bVisible = FALSE; // 设置光标不可见
+    cursorInfo.bVisible = FALSE;
     SetConsoleCursorInfo(hConsole, &cursorInfo);
 }
 
@@ -39,7 +39,7 @@ void showCursor()
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO cursorInfo;
     GetConsoleCursorInfo(hConsole, &cursorInfo);
-    cursorInfo.bVisible = TRUE; // 设置光标可见
+    cursorInfo.bVisible = TRUE;
     SetConsoleCursorInfo(hConsole, &cursorInfo);
 }
 
@@ -94,7 +94,7 @@ void mainMenuLoop(MenuHandle menuHandle)
             }
             else if (c == 'C')
                 exit(0);
-            Sleep(100); // 软件延时消抖
+            Sleep(100); 
         }
     }
 }
@@ -136,7 +136,7 @@ void subMenu1Loop(MenuHandle menuHandle)
                 if (isCurrentMenu(menuHandle))
                     updateCurrentMenu(menuHandle);
             }
-            Sleep(100); // 软件延时消抖
+            Sleep(100); 
         }
     }
 }
@@ -177,7 +177,7 @@ void subMenu2Loop(MenuHandle menuHandle)
                 if (isCurrentMenu(menuHandle))
                     updateCurrentMenu(menuHandle);
             }
-            Sleep(100); // 软件延时消抖
+            Sleep(100); 
         }
     }
 }
