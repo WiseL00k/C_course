@@ -8,6 +8,16 @@
 #include "status.h"
 
 #define MAX_SIZE 15
+
+typedef enum
+{
+    LOCATION,
+    NUMBER,
+    MAXCAPACITY,
+    TYPE,
+    ADMIN,
+} LabInfoType;
+
 typedef struct
 {
     int year;
@@ -19,21 +29,21 @@ typedef struct
 {
     char location[MAX_SIZE]; // 实验室地点
     char number[MAX_SIZE];   // 实验室编号
-    int maxCapacity;        // 实验室最多人数
+    int maxCapacity;         // 实验室最多人数
     char type[MAX_SIZE];     // 实验室类型
     char admin[MAX_SIZE];    // 实验室管理员
-} LabInfo;                  // 实验室信息结构体
+} LabInfo;                   // 实验室信息结构体
 
 typedef struct
 {
-    Date data;                // 日期
-    Date startTime;           // 起始时间
-    Date endTime;             // 结束时间
+    Date data;                 // 日期
+    Date startTime;            // 起始时间
+    Date endTime;              // 结束时间
     char personName[MAX_SIZE]; // 预约人姓名
     char content[MAX_SIZE];    // 实验内容
     char phoneNum[MAX_SIZE];   // 预约人电话
     char roomNum[MAX_SIZE];    // 预约实验室编号
-} LabReservation;             // 实验室预约信息结构体
+} LabReservation;              // 实验室预约信息结构体
 
 typedef struct LabReservationNode
 {
@@ -61,7 +71,7 @@ Status deleteLab();
 // 查找指定实验室信息
 Status searchLabInfo();
 // 修改实验室信息
-Status modifyLabInfo();
+Status modifyLabInfo(LabInfoType infoType);
 // 显示所有实验室
 Status displayAllLabInfo();
 
@@ -102,5 +112,7 @@ Status loadStatistics();
 /* 辅助函数 */
 // 判断实验室是否已存在
 Status isLabExist(Lab lab);
+// 查找指定实验室并返回其指针
+LabPtr findLab(char *location, char *number);
 
 #endif // __LAB_H__

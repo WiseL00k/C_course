@@ -4,6 +4,8 @@
 #define UP -1
 #define DOWN 1
 
+#define MAXSIZE 25
+
 typedef char ChangeMenuItemAction;
 
 typedef enum
@@ -72,7 +74,7 @@ typedef struct Menu
         int y;        // 行
     } topMenuInfoPos; // 顶部菜单信息行坐标
 
-    const char *bottomMenuInfo; // 底部菜单信息
+    char *bottomMenuInfo; // 底部菜单信息
     struct
     {
         int x;           // 列

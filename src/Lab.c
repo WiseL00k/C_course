@@ -87,18 +87,19 @@ Status searchLabInfo()
     {
         if (strcmp(p->lab.labInfo.location, location) == 0 && strcmp(p->lab.labInfo.number, number) == 0)
         {
-            printf("实验室地点: %s\n", p->lab.labInfo.location);
+            printf("\n实验室地点: %s\n", p->lab.labInfo.location);
             printf("实验室编号: %s\n", p->lab.labInfo.number);
             printf("实验室最多人数: %d\n", p->lab.labInfo.maxCapacity);
             printf("实验室类型: %s\n", p->lab.labInfo.type);
-            printf("实验室管理员: %s\n", p->lab.labInfo.admin);
+            printf("实验室管理员: %s\n\n", p->lab.labInfo.admin);
             return OK;
         }
+        p = p->next;
     }
     return ERROR;
 }
 
-Status modifyLabInfo()
+Status modifyLabInfo(LabInfoType infoType)
 {
     system("cls");
     fflush(stdin);
@@ -112,22 +113,35 @@ Status modifyLabInfo()
     {
         if (strcmp(p->lab.labInfo.location, location) == 0 && strcmp(p->lab.labInfo.number, number) == 0)
         {
-            puts("请输入新的实验室地点: ");
-            scanf(" %s", p->lab.labInfo.location);
-            puts("请输入新的实验室编号: ");
-            scanf(" %s", p->lab.labInfo.number);
-            puts("请输入新的实验室最多人数: ");
-            scanf(" %d", &p->lab.labInfo.maxCapacity);
-            puts("请输入新的实验室类型: ");
-            scanf(" %s", p->lab.labInfo.type);
-            puts("请输入新的实验室管理员: ");
-            scanf(" %s", p->lab.labInfo.admin);
+            switch (infoType)
+            {
+            case LOCATION:
+                puts("请输入新的实验室地点: ");
+                scanf(" %s", p->lab.labInfo.location);
+                break;
+            case NUMBER:
+                puts("请输入新的实验室编号: ");
+                scanf(" %s", p->lab.labInfo.number);
+                break;
+            case MAXCAPACITY:
+                puts("请输入新的实验室最多人数: ");
+                scanf(" %d", &p->lab.labInfo.maxCapacity);
+                break;
+            case TYPE:
+                puts("请输入新的实验室类型: ");
+                scanf(" %s", p->lab.labInfo.type);
+                break;
+            case ADMIN:
+                puts("请输入新的实验室管理员: ");
+                scanf(" %s", p->lab.labInfo.admin);
+                break;
+            }
             return OK;
         }
         p = p->next;
     }
+    return ERROR;
 }
-
 Status displayAllLabInfo()
 {
     LabList p = labList;
@@ -204,4 +218,8 @@ Status isLabExist(Lab newLab)
         p = p->next;
     }
     return FALSE;
+}
+
+LabPtr findLab(char *location, char *number)
+{
 }

@@ -115,7 +115,8 @@ void subMenu1Loop(MenuHandle menuHandle)
             }
             else if (c == '\r')
             {
-                switch (getSelectedMenuItemTag())
+                char tag = getSelectedMenuItemTag();
+                switch (tag)
                 {
                 case 'A':
                     if (addLab())
@@ -136,14 +137,10 @@ void subMenu1Loop(MenuHandle menuHandle)
                         puts("查找失败");
                     break;
                 case 'D':
-                    if (modifyLabInfo())
-                        puts("修改成功!");
-                    else
-                        puts("修改失败");
+                    changeCurrentMenu();
                     break;
                 case 'E':
                     displayAllLabInfo();
-
                     break;
                 case 'F':
                     changeCurrentMenu();
@@ -151,7 +148,65 @@ void subMenu1Loop(MenuHandle menuHandle)
                 default:
                     break;
                 }
-                if (getSelectedMenuItemTag() != 'F')
+                if (tag != 'F' && tag != 'D')
+                {
+                    puts("按任意键返回...");
+                    getch();
+                }
+                if (isCurrentMenu(menuHandle))
+                    updateCurrentMenu(menuHandle);
+            }
+            Sleep(100);
+        }
+    }
+}
+
+void subMenu1_4Loop(MenuHandle menuHandle)
+{
+    char c;
+    while (isCurrentMenu(menuHandle))
+    {
+        if (kbhit())
+        {
+            if (GetAsyncKeyState(VK_UP))
+            {
+                updateSelectedMenuItem(UP);
+            }
+            if (GetAsyncKeyState(VK_DOWN))
+            {
+                updateSelectedMenuItem(DOWN);
+            }
+            c = getch();
+            if (c <= 'z' && c >= 'a')
+                c -= ('a' - 'A');
+            if (c <= 'A' + menuHandle->menuItemListHandle->count - 1 && c >= 'A')
+            {
+                updateSelectedMenuItem(c);
+            }
+            else if (c == '\r')
+            {
+                LabInfoType infoType;
+                char tag = getSelectedMenuItemTag();
+                switch (tag)
+                {
+                case 'A':
+                case 'B':
+                case 'C':
+                case 'D':
+                case 'E':
+                    infoType = tag - 'A';
+                    if (modifyLabInfo(infoType))
+                        puts("修改成功!");
+                    else
+                        puts("修改失败");
+                    break;
+                case 'F':
+                    changeCurrentMenu();
+                    break;
+                default:
+                    break;
+                }
+                if (tag != 'F')
                 {
                     puts("按任意键返回...");
                     getch();
@@ -188,7 +243,8 @@ void subMenu2Loop(MenuHandle menuHandle)
             }
             else if (c == '\r')
             {
-                switch (getSelectedMenuItemTag())
+                char tag = getSelectedMenuItemTag();
+                switch (tag)
                 {
                 case 'A':
                     break;
@@ -238,7 +294,8 @@ void subMenu3Loop(MenuHandle menuHandle)
             }
             else if (c == '\r')
             {
-                switch (getSelectedMenuItemTag())
+                char tag = getSelectedMenuItemTag();
+                switch (tag)
                 {
                 case 'A':
                     break;
@@ -286,23 +343,21 @@ void subMenu4Loop(MenuHandle menuHandle)
             }
             else if (c == '\r')
             {
-                switch (getSelectedMenuItemTag())
+                char tag = getSelectedMenuItemTag();
+                switch (tag)
                 {
                 case 'A':
-                    if (saveLabInfo() == OK)
-                        puts("实验室信息保存成功");
-                    else
-                        puts("保存失败");
-                    puts("按任意键返回...");
-                    getch();
-                    break;
-                case 'B':
                     if (loadLabInfo())
                         puts("实验室信息加载成功");
                     else
                         puts("加载失败");
-                    puts("按任意键返回...");
-                    getch();
+                    break;
+                case 'B':
+                    if (saveLabInfo() == OK)
+                        puts("实验室信息保存成功");
+                    else
+                        puts("保存失败");
+
                     break;
                 case 'C':
 
@@ -316,6 +371,11 @@ void subMenu4Loop(MenuHandle menuHandle)
 
                 default:
                     break;
+                }
+                if (tag != 'E')
+                {
+                    puts("按任意键返回...");
+                    getch();
                 }
                 if (isCurrentMenu(menuHandle))
                     updateCurrentMenu(menuHandle);
@@ -332,6 +392,7 @@ void initAllMenus(MenuHandle mainMenu)
     MenuHandle subMenu2 = initMenu(subMenu2Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
     MenuHandle subMenu3 = initMenu(subMenu3Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
     MenuHandle subMenu4 = initMenu(subMenu4Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
+    MenuHandle subMenu1_4 = initMenu(subMenu1_4Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
 
     MenuItemHandle mainMenuItem1 = initChangeMenuItem("实验室管理", ENTER_MENU_TYPE, subMenu1);
     MenuItemHandle mainMenuItem2 = initChangeMenuItem("实验室预约", ENTER_MENU_TYPE, subMenu2);
@@ -347,7 +408,7 @@ void initAllMenus(MenuHandle mainMenu)
     MenuItemHandle subMenu1Item1 = initExecFuncMenuItem("添加实验室信息");
     MenuItemHandle subMenu1Item2 = initExecFuncMenuItem("删除实验室信息");
     MenuItemHandle subMenu1Item3 = initExecFuncMenuItem("查找实验室信息");
-    MenuItemHandle subMenu1Item4 = initExecFuncMenuItem("修改实验室信息");
+    MenuItemHandle subMenu1Item4 = initChangeMenuItem("修改实验室信息", ENTER_MENU_TYPE, subMenu1_4);
     MenuItemHandle subMenu1Item5 = initExecFuncMenuItem("显示所有实验室信息");
     MenuItemHandle subMenu1Item6 = initChangeMenuItem("返回", EXIT_MENU_TYPE, mainMenu);
     registerMenuItem(subMenu1, subMenu1Item1);
@@ -356,6 +417,19 @@ void initAllMenus(MenuHandle mainMenu)
     registerMenuItem(subMenu1, subMenu1Item4);
     registerMenuItem(subMenu1, subMenu1Item5);
     registerMenuItem(subMenu1, subMenu1Item6);
+
+    MenuItemHandle subMenu1_4Item1 = initExecFuncMenuItem("修改实验室地点");
+    MenuItemHandle subMenu1_4Item2 = initExecFuncMenuItem("修改实验室编号");
+    MenuItemHandle subMenu1_4Item3 = initExecFuncMenuItem("修改实验室最大人数");
+    MenuItemHandle subMenu1_4Item4 = initExecFuncMenuItem("修改实验室类型");
+    MenuItemHandle subMenu1_4Item5 = initExecFuncMenuItem("修改实验室管理员");
+    MenuItemHandle subMenu1_4Item6 = initChangeMenuItem("返回", EXIT_MENU_TYPE, subMenu1);
+    registerMenuItem(subMenu1_4, subMenu1_4Item1);
+    registerMenuItem(subMenu1_4, subMenu1_4Item2);
+    registerMenuItem(subMenu1_4, subMenu1_4Item3);
+    registerMenuItem(subMenu1_4, subMenu1_4Item4);
+    registerMenuItem(subMenu1_4, subMenu1_4Item5);
+    registerMenuItem(subMenu1_4, subMenu1_4Item6);
 
     MenuItemHandle subMenu2Item1 = initExecFuncMenuItem("添加预约信息");
     MenuItemHandle subMenu2Item2 = initExecFuncMenuItem("删除预约信息");
@@ -379,10 +453,10 @@ void initAllMenus(MenuHandle mainMenu)
     registerMenuItem(subMenu3, subMenu3Item3);
     registerMenuItem(subMenu3, subMenu3Item4);
 
-    MenuItemHandle subMenu4Item1 = initExecFuncMenuItem("保存实验室信息");
-    MenuItemHandle subMenu4Item2 = initExecFuncMenuItem("加载实验室信息");
-    MenuItemHandle subMenu4Item3 = initExecFuncMenuItem("保存预约信息");
-    MenuItemHandle subMenu4Item4 = initExecFuncMenuItem("加载预约信息");
+    MenuItemHandle subMenu4Item1 = initExecFuncMenuItem("加载实验室信息");
+    MenuItemHandle subMenu4Item2 = initExecFuncMenuItem("保存实验室信息");
+    MenuItemHandle subMenu4Item3 = initExecFuncMenuItem("加载预约信息");
+    MenuItemHandle subMenu4Item4 = initExecFuncMenuItem("保存预约信息");
     MenuItemHandle subMenu4Item5 = initChangeMenuItem("返回", EXIT_MENU_TYPE, mainMenu);
     registerMenuItem(subMenu4, subMenu4Item1);
     registerMenuItem(subMenu4, subMenu4Item2);
