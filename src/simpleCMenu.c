@@ -149,6 +149,7 @@ void updateCurrentMenu(MenuHandle menuHandle)
 void enterMenuAction(struct MenuItem *self)
 {
     self->un.enter.nextMenu->selectedMenuItemHandle = self->un.exit.prevMenu->menuItemListHandle->head;
+    self->un.enter.nextMenu->selectedMenuItemTag = self->un.exit.prevMenu->menuItemListHandle->head->tag;
     updateCurrentMenu(self->un.enter.nextMenu);
 }
 

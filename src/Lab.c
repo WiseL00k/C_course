@@ -155,6 +155,11 @@ Status displayAllLabInfo()
     return OK;
 }
 
+Status addReservation()
+{
+    
+}
+
 Status saveLabInfo()
 {
     FILE *fp = fopen("lab.txt", "w");
