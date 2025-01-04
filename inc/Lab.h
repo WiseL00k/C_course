@@ -4,8 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 #include "status.h"
 
+#define MAX_SIZE 15
 typedef struct
 {
     int year;
@@ -15,23 +17,23 @@ typedef struct
 
 typedef struct
 {
-    char *location;
-    char *number;
-    int maxCapacity;
-    char *type;
-    char *admin;
-} LabInfo; // 实验室信息结构体
+    char location[MAX_SIZE]; // 实验室地点
+    char number[MAX_SIZE];   // 实验室编号
+    int maxCapacity;        // 实验室最多人数
+    char type[MAX_SIZE];     // 实验室类型
+    char admin[MAX_SIZE];    // 实验室管理员
+} LabInfo;                  // 实验室信息结构体
 
 typedef struct
 {
-    Date data;
-    Date startTime;
-    Date endTime;
-    char *personName;
-    char *content;
-    char *phoneNum;
-    char *roomNum;
-} LabReservation; // 实验室预约信息结构体
+    Date data;                // 日期
+    Date startTime;           // 起始时间
+    Date endTime;             // 结束时间
+    char personName[MAX_SIZE]; // 预约人姓名
+    char content[MAX_SIZE];    // 实验内容
+    char phoneNum[MAX_SIZE];   // 预约人电话
+    char roomNum[MAX_SIZE];    // 预约实验室编号
+} LabReservation;             // 实验室预约信息结构体
 
 typedef struct LabReservationNode
 {
@@ -41,9 +43,9 @@ typedef struct LabReservationNode
 
 typedef struct
 {
-    LabInfo *labInfo;
+    LabInfo labInfo;
     LabReservationList labReservation;
-} Lab; // 实验室结构体
+} Lab, *LabPtr; // 实验室结构体
 
 typedef struct LabNode
 {
@@ -82,5 +84,23 @@ Status calculateLabUsageTime();
 Status calculatePersonUsageTime();
 // 统计某实验室月/年使用情况
 Status calculateLabUsageSituation();
+
+/* 文件操作功能 */
+// 保存实验室信息
+Status saveLabInfo();
+// 读取实验室信息
+Status loadLabInfo();
+// 保存预约信息
+Status saveLabReservations();
+// 读取预约信息
+Status loadLabReservations();
+// 保存统计信息
+Status saveStatistics();
+// 读取统计信息
+Status loadStatistics();
+
+/* 辅助函数 */
+// 判断实验室是否已存在
+Status isLabExist(Lab lab);
 
 #endif // __LAB_H__

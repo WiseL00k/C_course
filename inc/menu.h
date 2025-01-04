@@ -5,6 +5,7 @@
 #include <conio.h>
 #include <windows.h>
 #include "simpleCMenu.h"
+#include "Lab.h"
 
 // Init menus
 void initAllMenus(MenuHandle mainMenu);

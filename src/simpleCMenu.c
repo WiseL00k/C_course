@@ -19,6 +19,7 @@ void changeCurrentMenu()
     {
     case ENTER_MENU_TYPE:
         currentMenuHandle->selectedMenuItemHandle->un.enter.enterMenuAction(currentMenuHandle->selectedMenuItemHandle);
+
         break;
     case EXIT_MENU_TYPE:
         currentMenuHandle->selectedMenuItemHandle->un.exit.exitMenuAction(currentMenuHandle->selectedMenuItemHandle);
@@ -130,6 +131,7 @@ void updateCurrentMenu(MenuHandle menuHandle)
 
 void enterMenuAction(struct MenuItem *self)
 {
+    self->un.enter.nextMenu->selectedMenuItemHandle = self->un.exit.prevMenu->menuItemListHandle->head;
     updateCurrentMenu(self->un.enter.nextMenu);
 }
 

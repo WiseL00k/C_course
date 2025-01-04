@@ -72,16 +72,14 @@ void mainMenuLoop(MenuHandle menuHandle)
                 switch (getSelectedMenuItemTag())
                 {
                 case 'A':
-                    changeCurrentMenu();
-                    break;
                 case 'B':
-                    changeCurrentMenu();
-                    break;
                 case 'C':
+                case 'D':
                     changeCurrentMenu();
                     break;
-                case 'D':
+                case 'E':
                     quit();
+                    break;
                 default:
                     break;
                 }
@@ -120,21 +118,43 @@ void subMenu1Loop(MenuHandle menuHandle)
                 switch (getSelectedMenuItemTag())
                 {
                 case 'A':
+                    if (addLab())
+                        puts("添加成功!");
+                    else
+                        puts("添加失败");
                     break;
                 case 'B':
+                    if (deleteLab())
+                        puts("删除成功!");
+                    else
+                        puts("删除失败,请不要删除不存在的实验室");
                     break;
                 case 'C':
-
+                    if (searchLabInfo())
+                        puts("查找成功!");
+                    else
+                        puts("查找失败");
                     break;
                 case 'D':
+                    if (modifyLabInfo())
+                        puts("修改成功!");
+                    else
+                        puts("修改失败");
                     break;
                 case 'E':
+                    displayAllLabInfo();
+
                     break;
                 case 'F':
                     changeCurrentMenu();
                     break;
                 default:
                     break;
+                }
+                if (getSelectedMenuItemTag() != 'F')
+                {
+                    puts("按任意键返回...");
+                    getch();
                 }
                 if (isCurrentMenu(menuHandle))
                     updateCurrentMenu(menuHandle);
@@ -242,21 +262,87 @@ void subMenu3Loop(MenuHandle menuHandle)
     }
 }
 
+void subMenu4Loop(MenuHandle menuHandle)
+{
+    char c;
+    while (isCurrentMenu(menuHandle))
+    {
+        if (kbhit())
+        {
+            if (GetAsyncKeyState(VK_UP))
+            {
+                updateSelectedMenuItem(UP);
+            }
+            if (GetAsyncKeyState(VK_DOWN))
+            {
+                updateSelectedMenuItem(DOWN);
+            }
+            c = getch();
+            if (c <= 'z' && c >= 'a')
+                c -= ('a' - 'A');
+            if (c <= 'A' + menuHandle->menuItemListHandle->count - 1 && c >= 'A')
+            {
+                updateSelectedMenuItem(c);
+            }
+            else if (c == '\r')
+            {
+                switch (getSelectedMenuItemTag())
+                {
+                case 'A':
+                    if (saveLabInfo() == OK)
+                        puts("实验室信息保存成功");
+                    else
+                        puts("保存失败");
+                    puts("按任意键返回...");
+                    getch();
+                    break;
+                case 'B':
+                    if (loadLabInfo())
+                        puts("实验室信息加载成功");
+                    else
+                        puts("加载失败");
+                    puts("按任意键返回...");
+                    getch();
+                    break;
+                case 'C':
+
+                    break;
+                case 'D':
+
+                    break;
+                case 'E':
+                    changeCurrentMenu();
+                    break;
+
+                default:
+                    break;
+                }
+                if (isCurrentMenu(menuHandle))
+                    updateCurrentMenu(menuHandle);
+            }
+            Sleep(100);
+        }
+    }
+}
+
 void initAllMenus(MenuHandle mainMenu)
 {
     hideCursor();
     MenuHandle subMenu1 = initMenu(subMenu1Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
     MenuHandle subMenu2 = initMenu(subMenu2Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
     MenuHandle subMenu3 = initMenu(subMenu3Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
+    MenuHandle subMenu4 = initMenu(subMenu4Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
 
     MenuItemHandle mainMenuItem1 = initChangeMenuItem("实验室管理", ENTER_MENU_TYPE, subMenu1);
     MenuItemHandle mainMenuItem2 = initChangeMenuItem("实验室预约", ENTER_MENU_TYPE, subMenu2);
     MenuItemHandle mainMenuItem3 = initChangeMenuItem("统计数据", ENTER_MENU_TYPE, subMenu3);
-    MenuItemHandle mainMenuItem4 = initExecFuncMenuItem("退出");
+    MenuItemHandle mainMenuItem4 = initChangeMenuItem("数据管理", ENTER_MENU_TYPE, subMenu4);
+    MenuItemHandle mainMenuItem5 = initExecFuncMenuItem("退出");
     registerMenuItem(mainMenu, mainMenuItem1);
     registerMenuItem(mainMenu, mainMenuItem2);
     registerMenuItem(mainMenu, mainMenuItem3);
     registerMenuItem(mainMenu, mainMenuItem4);
+    registerMenuItem(mainMenu, mainMenuItem5);
 
     MenuItemHandle subMenu1Item1 = initExecFuncMenuItem("添加实验室信息");
     MenuItemHandle subMenu1Item2 = initExecFuncMenuItem("删除实验室信息");
@@ -292,4 +378,15 @@ void initAllMenus(MenuHandle mainMenu)
     registerMenuItem(subMenu3, subMenu3Item2);
     registerMenuItem(subMenu3, subMenu3Item3);
     registerMenuItem(subMenu3, subMenu3Item4);
+
+    MenuItemHandle subMenu4Item1 = initExecFuncMenuItem("保存实验室信息");
+    MenuItemHandle subMenu4Item2 = initExecFuncMenuItem("加载实验室信息");
+    MenuItemHandle subMenu4Item3 = initExecFuncMenuItem("保存预约信息");
+    MenuItemHandle subMenu4Item4 = initExecFuncMenuItem("加载预约信息");
+    MenuItemHandle subMenu4Item5 = initChangeMenuItem("返回", EXIT_MENU_TYPE, mainMenu);
+    registerMenuItem(subMenu4, subMenu4Item1);
+    registerMenuItem(subMenu4, subMenu4Item2);
+    registerMenuItem(subMenu4, subMenu4Item3);
+    registerMenuItem(subMenu4, subMenu4Item4);
+    registerMenuItem(subMenu4, subMenu4Item5);
 }

@@ -65,14 +65,14 @@ typedef struct MenuItemList
 // 菜单
 typedef struct Menu
 {
-    const char* topMenuInfo;    // 顶部菜单信息
+    const char *topMenuInfo; // 顶部菜单信息
     struct
     {
         int x;        // 列
         int y;        // 行
     } topMenuInfoPos; // 顶部菜单信息行坐标
 
-    const char* bottomMenuInfo;    // 底部菜单信息
+    const char *bottomMenuInfo; // 底部菜单信息
     struct
     {
         int x;           // 列
