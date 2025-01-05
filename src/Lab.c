@@ -506,7 +506,7 @@ Status displayAllLabReservations()
 
 Status saveLabInfo()
 {
-    FILE *fp = fopen("lab.txt", "w");
+    FILE *fp = fopen("./lab.txt", "w");
     if (fp == NULL)
     {
         puts("文件打开失败");
@@ -524,7 +524,7 @@ Status saveLabInfo()
 
 Status loadLabInfo()
 {
-    FILE *fp = fopen("lab.txt", "r");
+    FILE *fp = fopen("./lab.txt", "r");
     if (fp == NULL)
     {
         puts("文件打开失败");
@@ -560,7 +560,7 @@ Status loadLabInfo()
 Status saveLabReservations()
 {
     char date[MAX_SIZE] = {'\0'}, startTime[MAX_SIZE] = {'\0'}, endTime[MAX_SIZE] = {'\0'};
-    FILE *fp = fopen("reservation.txt", "w");
+    FILE *fp = fopen("./reservation.txt", "w");
     if (fp == NULL)
     {
         puts("文件打开失败");
@@ -586,7 +586,7 @@ Status saveLabReservations()
 
 Status loadLabReservations()
 {
-    FILE *fp = fopen("reservation.txt", "r");
+    FILE *fp = fopen("./reservation.txt", "r");
     if (fp == NULL)
     {
         puts("文件打开失败");
