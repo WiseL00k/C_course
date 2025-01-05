@@ -7,7 +7,7 @@
 #include <windows.h>
 #include "status.h"
 
-#define MAX_SIZE 15
+#define MAX_SIZE 20
 
 typedef enum
 {
@@ -17,6 +17,15 @@ typedef enum
     TYPE,
     ADMIN,
 } LabInfoType;
+
+typedef enum
+{
+    STARTTIME,
+    ENDTIME,
+    PERSONNAME,
+    CONTENT,
+    PHONENUM,
+} ReservationInfoType;
 
 typedef struct
 {
@@ -36,7 +45,8 @@ typedef struct
 
 typedef struct
 {
-    Date data;                 // 日期
+    int reservationID;         // 预约编号
+    Date date;                 // 预约日期
     Date startTime;            // 起始时间
     Date endTime;              // 结束时间
     char personName[MAX_SIZE]; // 预约人姓名
@@ -54,8 +64,9 @@ typedef struct LabReservationNode
 typedef struct
 {
     LabInfo labInfo;
-    LabReservationList labReservation;
-} Lab, *LabPtr; // 实验室结构体
+    LabReservationList labReservations;
+    int labReservationCount; // 实验室预约次数
+} Lab, *LabPtr;              // 实验室结构体
 
 typedef struct LabNode
 {
@@ -83,7 +94,7 @@ Status deleteReservation();
 // 查询预约
 Status searchReservation();
 // 修改预约
-Status modifyReservation();
+Status modifyReservation(ReservationInfoType infoType);
 // 显示所有预约
 Status displayAllLabReservations();
 
@@ -96,23 +107,23 @@ Status calculatePersonUsageTime();
 Status calculateLabUsageSituation();
 
 /* 文件操作功能 */
-// 保存实验室信息
-Status saveLabInfo();
 // 读取实验室信息
 Status loadLabInfo();
-// 保存预约信息
-Status saveLabReservations();
+// 保存实验室信息
+Status saveLabInfo();
 // 读取预约信息
 Status loadLabReservations();
-// 保存统计信息
-Status saveStatistics();
-// 读取统计信息
-Status loadStatistics();
+// 保存预约信息
+Status saveLabReservations();
 
 /* 辅助函数 */
 // 判断实验室是否已存在
 Status isLabExist(Lab lab);
 // 查找指定实验室并返回其指针
 LabPtr findLab(char *location, char *number);
+
+Status stringToDate(char *str, Date *date);
+Status dateToString(Date date, char *str);
+Status checkReservationConflict(LabReservation *labReservation1, LabReservation *labReservation2);
 
 #endif // __LAB_H__

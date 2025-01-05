@@ -1,4 +1,5 @@
 #include "menu.h"
+#include "Lab.h"
 
 void quit()
 {
@@ -244,23 +245,105 @@ void subMenu2Loop(MenuHandle menuHandle)
             else if (c == '\r')
             {
                 char tag = getSelectedMenuItemTag();
+                int flag;
                 switch (tag)
                 {
                 case 'A':
+                    flag = addReservation();
+                    if (flag == OK)
+                        puts("预约成功!");
+                    else if (flag == -2)
+                        puts("预约失败! 未找到该实验室");
+                    else if (flag == OVERFLOW)
+                        puts("预约失败! 内存溢出");
                     break;
                 case 'B':
+                    flag = deleteReservation();
+                    if (flag == OK)
+                        puts("删除成功!");
+                    else if (flag == -2)
+                        puts("删除失败! 未找到该实验室相关预约信息");
                     break;
                 case 'C':
+                    flag = searchReservation();
+                    if (flag == OK)
+                        puts("查询成功!");
+                    else if (flag == -2)
+                        puts("查询失败! 未找到该实验室相关预约信息");
                     break;
                 case 'D':
+                    changeCurrentMenu();
                     break;
                 case 'E':
+                    displayAllLabReservations();
                     break;
                 case 'F':
                     changeCurrentMenu();
                     break;
                 default:
                     break;
+                }
+                if (tag != 'F' && tag != 'D')
+                {
+                    puts("按任意键返回...");
+                    getch();
+                }
+                if (isCurrentMenu(menuHandle))
+                    updateCurrentMenu(menuHandle);
+            }
+            Sleep(100);
+        }
+    }
+}
+
+void subMenu2_4Loop(MenuHandle menuHandle)
+{
+    char c;
+    while (isCurrentMenu(menuHandle))
+    {
+        if (kbhit())
+        {
+            if (GetAsyncKeyState(VK_UP))
+            {
+                updateSelectedMenuItem(UP);
+            }
+            if (GetAsyncKeyState(VK_DOWN))
+            {
+                updateSelectedMenuItem(DOWN);
+            }
+            c = getch();
+            if (c <= 'z' && c >= 'a')
+                c -= ('a' - 'A');
+            if (c <= 'A' + menuHandle->menuItemListHandle->count - 1 && c >= 'A')
+            {
+                updateSelectedMenuItem(c);
+            }
+            else if (c == '\r')
+            {
+                int flag;
+                char tag = getSelectedMenuItemTag();
+                switch (tag)
+                {
+                case 'A':
+                case 'B':
+                case 'C':
+                case 'D':
+                case 'E':
+                    flag = modifyReservation(tag - 'A');
+                    if (flag == OK)
+                        puts("修改成功!");
+                    else if (flag == -2)
+                        puts("修改失败!");
+                    break;
+                case 'F':
+                    changeCurrentMenu();
+                default:
+                    break;
+                }
+                if (tag != 'F')
+                {
+                    puts("按任意键返回...");
+                    getch();
                 }
                 if (isCurrentMenu(menuHandle))
                     updateCurrentMenu(menuHandle);
@@ -348,22 +431,28 @@ void subMenu4Loop(MenuHandle menuHandle)
                 {
                 case 'A':
                     if (loadLabInfo())
-                        puts("实验室信息加载成功");
+                        puts("实验室信息加载成功!");
                     else
                         puts("加载失败");
                     break;
                 case 'B':
                     if (saveLabInfo() == OK)
-                        puts("实验室信息保存成功");
+                        puts("实验室信息保存成功!");
                     else
                         puts("保存失败");
 
                     break;
                 case 'C':
-
+                    if (loadLabReservations())
+                        puts("实验室预约信息加载成功!");
+                    else
+                        puts("实验室预约信息加载失败!");
                     break;
                 case 'D':
-
+                    if (saveLabReservations())
+                        puts("实验室预约信息保存成功!");
+                    else
+                        puts("实验室预约信息保存失败!");
                     break;
                 case 'E':
                     changeCurrentMenu();
@@ -393,6 +482,7 @@ void initAllMenus(MenuHandle mainMenu)
     MenuHandle subMenu3 = initMenu(subMenu3Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
     MenuHandle subMenu4 = initMenu(subMenu4Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
     MenuHandle subMenu1_4 = initMenu(subMenu1_4Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
+    MenuHandle subMenu2_4 = initMenu(subMenu2_4Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
 
     MenuItemHandle mainMenuItem1 = initChangeMenuItem("实验室管理", ENTER_MENU_TYPE, subMenu1);
     MenuItemHandle mainMenuItem2 = initChangeMenuItem("实验室预约", ENTER_MENU_TYPE, subMenu2);
@@ -434,7 +524,7 @@ void initAllMenus(MenuHandle mainMenu)
     MenuItemHandle subMenu2Item1 = initExecFuncMenuItem("添加预约信息");
     MenuItemHandle subMenu2Item2 = initExecFuncMenuItem("删除预约信息");
     MenuItemHandle subMenu2Item3 = initExecFuncMenuItem("查找预约信息");
-    MenuItemHandle subMenu2Item4 = initExecFuncMenuItem("修改预约信息");
+    MenuItemHandle subMenu2Item4 = initChangeMenuItem("修改预约信息", ENTER_MENU_TYPE, subMenu2_4);
     MenuItemHandle subMenu2Item5 = initExecFuncMenuItem("显示所有预约信息");
     MenuItemHandle subMenu2Item6 = initChangeMenuItem("返回", EXIT_MENU_TYPE, mainMenu);
     registerMenuItem(subMenu2, subMenu2Item1);
@@ -443,6 +533,19 @@ void initAllMenus(MenuHandle mainMenu)
     registerMenuItem(subMenu2, subMenu2Item4);
     registerMenuItem(subMenu2, subMenu2Item5);
     registerMenuItem(subMenu2, subMenu2Item6);
+
+    MenuItemHandle subMenu2_4Item1 = initExecFuncMenuItem("修改预约起始时间");
+    MenuItemHandle subMenu2_4Item2 = initExecFuncMenuItem("修改预约结束时间");
+    MenuItemHandle subMenu2_4Item3 = initExecFuncMenuItem("修改预约人姓名");
+    MenuItemHandle subMenu2_4Item4 = initExecFuncMenuItem("修改预约内容");
+    MenuItemHandle subMenu2_4Item5 = initExecFuncMenuItem("修改预约人电话");
+    MenuItemHandle subMenu2_4Item6 = initChangeMenuItem("返回", EXIT_MENU_TYPE, subMenu2);
+    registerMenuItem(subMenu2_4, subMenu2_4Item1);
+    registerMenuItem(subMenu2_4, subMenu2_4Item2);
+    registerMenuItem(subMenu2_4, subMenu2_4Item3);
+    registerMenuItem(subMenu2_4, subMenu2_4Item4);
+    registerMenuItem(subMenu2_4, subMenu2_4Item5);
+    registerMenuItem(subMenu2_4, subMenu2_4Item6);
 
     MenuItemHandle subMenu3Item1 = initExecFuncMenuItem("统计实验室月/年使用时间");
     MenuItemHandle subMenu3Item2 = initExecFuncMenuItem("统计某人月/年使用时间");

@@ -2,6 +2,8 @@
 #include "simpleCMenu.h"
 #include "menu.h"
 
+#include "lab.h"
+
 int main(void)
 {
     initMenuDisplayFunctions(displayMenuItem, displaySelectedMenuItem, goToxy);
@@ -13,6 +15,7 @@ int main(void)
 
     initAllMenus(mainMenu);
 
+    loadLabInfo();
     runMainMenu(mainMenu);
 
     return 0;
