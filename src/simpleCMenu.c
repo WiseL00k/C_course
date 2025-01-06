@@ -36,7 +36,7 @@ void updateCurrnetMenuTime()
 {
     currentTime = time(NULL);
     struct tm *localTime = localtime(&currentTime); // 转换为当地时间
-    sprintf(currentMenuHandle->bottomMenuInfo, "当前时间：%d-%d-%d %d:%d:%d \n",
+    sprintf(currentMenuHandle->bottomMenuInfo, "当前时间：%d-%d-%d %02d:%02d:%02d \n",
             localTime->tm_year + 1900, // 年（从1900年起）
             localTime->tm_mon + 1,     // 月（0-11，需加1）
             localTime->tm_mday,        // 日
