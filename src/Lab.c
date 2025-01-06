@@ -538,17 +538,22 @@ Status displayAllLabReservations()
 
 Status calculateAllLabSituation(StatiType statiType)
 {
+    fflush(stdin);
     switch (statiType)
     {
     case MONTHLY:
     {
         int month = 0;
-        puts("请输入月份(范围: 1-12): ");
-        scanf(" %d", &month);
-        if (month <= 0 || month > 12)
+        while (1)
         {
-            puts("输入的月份不正确，请重新输入");
-            return ERROR;
+            puts("请输入月份(范围: 1-12): ");
+            scanf(" %d", &month);
+            if (month <= 0 || month > 12)
+            {
+                puts("输入的月份不正确，请重新输入");
+                continue;
+            }
+            break;
         }
         printf("%d月全部实验室的预约情况如下: \n");
         puts("地点\t\t编号\t预约次数\t使用天数");
@@ -577,7 +582,70 @@ Status calculateAllLabSituation(StatiType statiType)
 
 Status calculatePersonUsageTime(StatiType statiType)
 {
+    char name[MAX_SIZE] = {'\0'};
+    int month = 0;
+    puts("请输入要查询的预约人姓名: ");
+    fflush(stdin);
+    scanf(" %s", name);
+    if (statiType == MONTHLY)
+    {
+        month = getMonthInput();
+    }
 
+    LabList p = labList;
+    int totalUsageTime = 0, totalCount = 0;
+    printf("%s的各预约情况如下: \n");
+    puts("预约日期\t地点\t\t实验室编号\t起始时间\t结束时间\t实验内容\t使用时间");
+    while (p)
+    {
+        Lab tmpLab = p->lab;
+        LabReservationNode *labReserPtr = tmpLab.labReservations;
+        while (labReserPtr)
+        {
+            if (strcmp(labReserPtr->labReservation.personName, name) == 0)
+            {
+                int usageTime = getReservatonUsageTime(labReserPtr->labReservation);
+                char startTime[MAX_SIZE] = {'\0'}, endTime[MAX_SIZE] = {'\0'}, date[MAX_SIZE] = {'\0'};
+                dateToString(labReserPtr->labReservation.date, date);
+                dateToString(labReserPtr->labReservation.startTime, startTime);
+                dateToString(labReserPtr->labReservation.endTime, endTime);
+                if (statiType == MONTHLY)
+                {
+                    if (labReserPtr->labReservation.date.month == month)
+                        printf("%s\t%s\t\t%s\t%s\t%s\t%s\t\t%d天\n",
+                               date,
+                               tmpLab.labInfo.location,
+                               tmpLab.labInfo.number,
+                               startTime,
+                               endTime,
+                               labReserPtr->labReservation.content,
+                               usageTime);
+                }
+                else
+                    printf("%s\t%s\t%s\t\t%s\t%s\t%s\t\t%d天\n",
+                           date,
+                           tmpLab.labInfo.location,
+                           tmpLab.labInfo.number,
+                           startTime,
+                           endTime,
+                           labReserPtr->labReservation.content,
+                           usageTime);
+                totalUsageTime += usageTime;
+                totalCount++;
+            }
+            labReserPtr = labReserPtr->next;
+        }
+        p = p->next;
+    }
+    if (totalCount != 0)
+    {
+        if (statiType == MONTHLY)
+            printf("%d月份%s的预约实验总时间为: %d 天, 预约总次数为%d \n", month, name, totalUsageTime, totalCount);
+        else
+            printf("今年%s的预约实验总时间为: %d 天, 预约总次数为%d \n", name, totalUsageTime, totalCount);
+    }
+    else
+        printf("\n%s没有预约实验记录\n", name);
     return OK;
 }
 
@@ -822,4 +890,21 @@ Status checkReservationConflict(LabReservation *labReservation1, LabReservation 
 int getReservatonUsageTime(LabReservation reservation)
 {
     return reservation.endTime.month * monthDays[reservation.endTime.month] + reservation.endTime.day - reservation.startTime.month * monthDays[reservation.startTime.month] - reservation.startTime.day;
+}
+
+int getMonthInput()
+{
+    int month = 0;
+    while (1)
+    {
+        puts("请输入月份(范围: 1-12): ");
+        scanf(" %d", &month);
+        if (month <= 0 || month > 12)
+        {
+            puts("输入的月份不正确，请重新输入");
+            continue;
+        }
+        break;
+    }
+    return month;
 }

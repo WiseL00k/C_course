@@ -507,6 +507,50 @@ void subMenu3_1Loop(MenuHandle menuHandle)
 
 void subMenu3_2Loop(MenuHandle menuHandle)
 {
+    char c;
+    while (isCurrentMenu(menuHandle))
+    {
+        if (kbhit())
+        {
+            if (GetAsyncKeyState(VK_UP))
+            {
+                updateSelectedMenuItem(UP);
+            }
+            if (GetAsyncKeyState(VK_DOWN))
+            {
+                updateSelectedMenuItem(DOWN);
+            }
+            c = getch();
+            if (c <= 'z' && c >= 'a')
+                c -= ('a' - 'A');
+            if (c <= 'A' + menuHandle->menuItemListHandle->count - 1 && c >= 'A')
+            {
+                updateSelectedMenuItem(c);
+            }
+            else if (c == '\r')
+            {
+                char tag = getSelectedMenuItemTag();
+                switch (tag)
+                {
+                case 'A':
+                case 'B':
+                    calculatePersonUsageTime(tag - 'A');
+                    break;
+                case 'C':
+                    changeCurrentMenu();
+                    break;
+                }
+                if (tag != 'C')
+                {
+                    puts("按任意键返回...");
+                    getch();
+                }
+                if (isCurrentMenu(menuHandle))
+                    updateCurrentMenu(menuHandle);
+            }
+            Sleep(100);
+        }
+    }
 }
 
 void subMenu3_3Loop(MenuHandle menuHandle)

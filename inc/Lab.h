@@ -134,5 +134,6 @@ Status stringToDate(char *str, Date *date);
 Status dateToString(Date date, char *str);
 Status checkReservationConflict(LabReservation *labReservation1, LabReservation *labReservation2);
 int getReservatonUsageTime(LabReservation reservation);
+int getMonthInput();
 
 #endif // __LAB_H__
