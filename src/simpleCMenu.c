@@ -6,6 +6,7 @@
 
 static MenuHandle currentMenuHandle = NULL;
 static MenuDisplayFunctions menuDisplayFunctions = {NULL, NULL, NULL};
+static time_t currentTime;
 
 char getSelectedMenuItemTag()
 {
@@ -33,7 +34,6 @@ void changeCurrentMenu()
 
 void updateCurrnetMenuTime()
 {
-    static time_t currentTime;
     currentTime = time(NULL);
     struct tm *localTime = localtime(&currentTime); // 转换为当地时间
     sprintf(currentMenuHandle->bottomMenuInfo, "当前时间：%d-%d-%d %d:%d:%d \n",

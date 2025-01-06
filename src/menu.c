@@ -81,8 +81,6 @@ void mainMenuLoop(MenuHandle menuHandle)
                 case 'E':
                     quit();
                     break;
-                default:
-                    break;
                 }
                 if (isCurrentMenu(menuHandle))
                     updateCurrentMenu(menuHandle);
@@ -146,8 +144,6 @@ void subMenu1Loop(MenuHandle menuHandle)
                 case 'F':
                     changeCurrentMenu();
                     break;
-                default:
-                    break;
                 }
                 if (tag != 'F' && tag != 'D')
                 {
@@ -204,8 +200,6 @@ void subMenu1_4Loop(MenuHandle menuHandle)
                 case 'F':
                     changeCurrentMenu();
                     break;
-                default:
-                    break;
                 }
                 if (tag != 'F')
                 {
@@ -253,7 +247,7 @@ void subMenu2Loop(MenuHandle menuHandle)
                     if (flag == OK)
                         puts("预约成功!");
                     else if (flag == -2)
-                        puts("预约失败! 未找到该实验室");
+                        puts("预约失败! 该实验室不存在");
                     else if (flag == OVERFLOW)
                         puts("预约失败! 内存溢出");
                     break;
@@ -279,8 +273,6 @@ void subMenu2Loop(MenuHandle menuHandle)
                     break;
                 case 'F':
                     changeCurrentMenu();
-                    break;
-                default:
                     break;
                 }
                 if (tag != 'F' && tag != 'D')
@@ -337,8 +329,6 @@ void subMenu2_4Loop(MenuHandle menuHandle)
                     break;
                 case 'F':
                     changeCurrentMenu();
-                default:
-                    break;
                 }
                 if (tag != 'F')
                 {
@@ -381,17 +371,10 @@ void subMenu3Loop(MenuHandle menuHandle)
                 switch (tag)
                 {
                 case 'A':
-                    break;
                 case 'B':
-                    break;
                 case 'C':
-
-                    break;
                 case 'D':
                     changeCurrentMenu();
-                    break;
-
-                default:
                     break;
                 }
                 if (isCurrentMenu(menuHandle))
@@ -474,6 +457,62 @@ void subMenu4Loop(MenuHandle menuHandle)
     }
 }
 
+void subMenu3_1Loop(MenuHandle menuHandle)
+{
+    char c;
+    while (isCurrentMenu(menuHandle))
+    {
+        if (kbhit())
+        {
+            if (GetAsyncKeyState(VK_UP))
+            {
+                updateSelectedMenuItem(UP);
+            }
+            if (GetAsyncKeyState(VK_DOWN))
+            {
+                updateSelectedMenuItem(DOWN);
+            }
+            c = getch();
+            if (c <= 'z' && c >= 'a')
+                c -= ('a' - 'A');
+            if (c <= 'A' + menuHandle->menuItemListHandle->count - 1 && c >= 'A')
+            {
+                updateSelectedMenuItem(c);
+            }
+            else if (c == '\r')
+            {
+                char tag = getSelectedMenuItemTag();
+                switch (tag)
+                {
+                case 'A':
+                case 'B':
+                    calculateAllLabSituation(tag - 'A');
+                    break;
+                case 'C':
+                    changeCurrentMenu();
+                    break;
+                }
+                if (tag != 'C')
+                {
+                    puts("按任意键返回...");
+                    getch();
+                }
+                if (isCurrentMenu(menuHandle))
+                    updateCurrentMenu(menuHandle);
+            }
+            Sleep(100);
+        }
+    }
+}
+
+void subMenu3_2Loop(MenuHandle menuHandle)
+{
+}
+
+void subMenu3_3Loop(MenuHandle menuHandle)
+{
+}
+
 void initAllMenus(MenuHandle mainMenu)
 {
     hideCursor();
@@ -483,6 +522,9 @@ void initAllMenus(MenuHandle mainMenu)
     MenuHandle subMenu4 = initMenu(subMenu4Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
     MenuHandle subMenu1_4 = initMenu(subMenu1_4Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
     MenuHandle subMenu2_4 = initMenu(subMenu2_4Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
+    MenuHandle subMenu3_1 = initMenu(subMenu3_1Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
+    MenuHandle subMenu3_2 = initMenu(subMenu3_2Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
+    MenuHandle subMenu3_3 = initMenu(subMenu3_3Loop, mainMenu->topMenuInfo, mainMenu->bottomMenuInfo);
 
     MenuItemHandle mainMenuItem1 = initChangeMenuItem("实验室管理", ENTER_MENU_TYPE, subMenu1);
     MenuItemHandle mainMenuItem2 = initChangeMenuItem("实验室预约", ENTER_MENU_TYPE, subMenu2);
@@ -547,14 +589,35 @@ void initAllMenus(MenuHandle mainMenu)
     registerMenuItem(subMenu2_4, subMenu2_4Item5);
     registerMenuItem(subMenu2_4, subMenu2_4Item6);
 
-    MenuItemHandle subMenu3Item1 = initExecFuncMenuItem("统计实验室月/年使用时间");
-    MenuItemHandle subMenu3Item2 = initExecFuncMenuItem("统计某人月/年使用时间");
-    MenuItemHandle subMenu3Item3 = initExecFuncMenuItem("统计某实验室月/年使用情况");
+    MenuItemHandle subMenu3Item1 = initChangeMenuItem("统计实验室月/年使用时间", ENTER_MENU_TYPE, subMenu3_1);
+    MenuItemHandle subMenu3Item2 = initChangeMenuItem("统计某人月/年使用时间", ENTER_MENU_TYPE, subMenu3_2);
+    MenuItemHandle subMenu3Item3 = initChangeMenuItem("统计某实验室月/年使用情况", ENTER_MENU_TYPE, subMenu3_3);
     MenuItemHandle subMenu3Item4 = initChangeMenuItem("返回", EXIT_MENU_TYPE, mainMenu);
     registerMenuItem(subMenu3, subMenu3Item1);
     registerMenuItem(subMenu3, subMenu3Item2);
     registerMenuItem(subMenu3, subMenu3Item3);
     registerMenuItem(subMenu3, subMenu3Item4);
+
+    MenuItemHandle subMenu3_1Item1 = initExecFuncMenuItem("按月统计");
+    MenuItemHandle subMenu3_1Item2 = initExecFuncMenuItem("按年统计");
+    MenuItemHandle subMenu3_1Item3 = initChangeMenuItem("返回", EXIT_MENU_TYPE, subMenu3);
+    registerMenuItem(subMenu3_1, subMenu3_1Item1);
+    registerMenuItem(subMenu3_1, subMenu3_1Item2);
+    registerMenuItem(subMenu3_1, subMenu3_1Item3);
+
+    MenuItemHandle subMenu3_2Item1 = initExecFuncMenuItem("按月统计");
+    MenuItemHandle subMenu3_2Item2 = initExecFuncMenuItem("按年统计");
+    MenuItemHandle subMenu3_2Item3 = initChangeMenuItem("返回", EXIT_MENU_TYPE, subMenu3);
+    registerMenuItem(subMenu3_2, subMenu3_2Item1);
+    registerMenuItem(subMenu3_2, subMenu3_2Item2);
+    registerMenuItem(subMenu3_2, subMenu3_2Item3);
+
+    MenuItemHandle subMenu3_3Item1 = initExecFuncMenuItem("按月统计");
+    MenuItemHandle subMenu3_3Item2 = initExecFuncMenuItem("按年统计");
+    MenuItemHandle subMenu3_3Item3 = initChangeMenuItem("返回", EXIT_MENU_TYPE, subMenu3);
+    registerMenuItem(subMenu3_3, subMenu3_3Item1);
+    registerMenuItem(subMenu3_3, subMenu3_3Item2);
+    registerMenuItem(subMenu3_3, subMenu3_3Item3);
 
     MenuItemHandle subMenu4Item1 = initExecFuncMenuItem("加载实验室信息");
     MenuItemHandle subMenu4Item2 = initExecFuncMenuItem("保存实验室信息");

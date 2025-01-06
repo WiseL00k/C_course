@@ -27,6 +27,12 @@ typedef enum
     PHONENUM,
 } ReservationInfoType;
 
+typedef enum
+{
+    MONTHLY,
+    YEARLY,
+} StatiType;
+
 typedef struct
 {
     int year;
@@ -45,7 +51,7 @@ typedef struct
 
 typedef struct
 {
-    int reservationID;         // 预约编号
+    int reservationID;         // 预约编号,在一个实验室的所有预约中ID都是唯一的
     Date date;                 // 预约日期
     Date startTime;            // 起始时间
     Date endTime;              // 结束时间
@@ -65,8 +71,9 @@ typedef struct
 {
     LabInfo labInfo;
     LabReservationList labReservations;
-    int labReservationCount; // 实验室预约次数
-} Lab, *LabPtr;              // 实验室结构体
+    int labReservationCount[13]; // 实验室预约次数
+    int labReservationTime[13];  // 实验室使用时间,单位:天
+} Lab, *LabPtr;                  // 实验室结构体
 
 typedef struct LabNode
 {
@@ -99,12 +106,12 @@ Status modifyReservation(ReservationInfoType infoType);
 Status displayAllLabReservations();
 
 /* 统计功能 */
-// 统计实验室月/年使用时间
-Status calculateLabUsageTime();
+// 统计所有实验室月/年使用情况
+Status calculateAllLabSituation(StatiType statiType);
 // 统计某人月/年使用时间
-Status calculatePersonUsageTime();
+Status calculatePersonUsageTime(StatiType statiType);
 // 统计某实验室月/年使用情况
-Status calculateLabUsageSituation();
+Status calculateLabUsageSituation(StatiType statiType);
 
 /* 文件操作功能 */
 // 读取实验室信息
@@ -121,9 +128,11 @@ Status saveLabReservations();
 Status isLabExist(Lab lab);
 // 查找指定实验室并返回其指针
 LabPtr findLab(char *location, char *number);
-
+// 将字符串转换为日期,用于从文件读取输入
+Status fstringToDate(char *str, Date *date); 
 Status stringToDate(char *str, Date *date);
 Status dateToString(Date date, char *str);
 Status checkReservationConflict(LabReservation *labReservation1, LabReservation *labReservation2);
+int getReservatonUsageTime(LabReservation reservation);
 
 #endif // __LAB_H__

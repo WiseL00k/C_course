@@ -16,6 +16,8 @@ int main(void)
     initAllMenus(mainMenu);
 
     loadLabInfo();
+    loadLabReservations();
+    
     runMainMenu(mainMenu);
 
     return 0;
