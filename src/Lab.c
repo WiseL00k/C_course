@@ -544,18 +544,8 @@ Status calculateAllLabSituation(StatiType statiType)
     case MONTHLY:
     {
         int month = 0;
-        while (1)
-        {
-            puts("请输入月份(范围: 1-12): ");
-            scanf(" %d", &month);
-            if (month <= 0 || month > 12)
-            {
-                puts("输入的月份不正确，请重新输入");
-                continue;
-            }
-            break;
-        }
-        printf("%d月全部实验室的预约情况如下: \n");
+        month = getMonthInput();
+        printf("%d月全部实验室的预约情况如下: \n", month);
         puts("地点\t\t编号\t预约次数\t使用天数");
         LabList p = labList;
         while (p)
@@ -594,7 +584,7 @@ Status calculatePersonUsageTime(StatiType statiType)
 
     LabList p = labList;
     int totalUsageTime = 0, totalCount = 0;
-    printf("%s的各预约情况如下: \n");
+    printf("%s的各预约情况如下: \n", name);
     puts("预约日期\t地点\t\t实验室编号\t起始时间\t结束时间\t实验内容\t使用时间");
     while (p)
     {
