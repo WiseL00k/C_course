@@ -8,20 +8,24 @@ static int monthDays[13] = {365, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 
 Status addLab()
 {
-    system("cls");
+    printf("\033[H\033[J"); // 清屏
     fflush(stdin);
     Lab newLab;
     newLab.labReservations = NULL;                                             // 初始化预约链表为空
     memset(newLab.labReservationCount, 0, sizeof(newLab.labReservationCount)); // 初始化预约次数为0
     memset(newLab.labReservationTime, 0, sizeof(newLab.labReservationTime));   // 初始化预约时间为0
-    puts("请输入实验室地点: ");
+    puts("请输入实验室地点(输入q/Q返回): ");
     scanf(" %s", newLab.labInfo.location);
-    puts("请输入实验室编号: ");
+    if (strcmp(newLab.labInfo.location, "q") == 0 || strcmp(newLab.labInfo.location, "Q") == 0)
+        return FALSE;
+    puts("请输入实验室编号(输入q/Q返回): ");
     scanf(" %s", newLab.labInfo.number);
+    if (strcmp(newLab.labInfo.location, "q") == 0 || strcmp(newLab.labInfo.location, "Q") == 0)
+        return FALSE;
     if (isLabExist(newLab))
     {
         puts("实验室已存在，请重新输入");
-        return ERROR;
+        return -2;
     }
     puts("请输入实验室最多人数: ");
     scanf(" %d", &newLab.labInfo.maxCapacity);
@@ -53,7 +57,7 @@ Status addLab()
 
 Status deleteLab()
 {
-    system("cls");
+    printf("\033[H\033[J"); // 清屏
     fflush(stdin);
     char labNumber[MAX_SIZE], location[MAX_SIZE];
     puts("请输入要删除的实验室地点: ");
@@ -89,7 +93,7 @@ Status deleteLab()
 
 Status searchLabInfo()
 {
-    system("cls");
+    printf("\033[H\033[J"); // 清屏
     fflush(stdin);
     char number[MAX_SIZE], location[MAX_SIZE];
     puts("请输入要查询的实验室地点: ");
@@ -115,7 +119,7 @@ Status searchLabInfo()
 
 Status modifyLabInfo(LabInfoType infoType)
 {
-    system("cls");
+    printf("\033[H\033[J"); // 清屏
     fflush(stdin);
     char number[MAX_SIZE], location[MAX_SIZE];
     puts("请输入要修改的实验室地点: ");
@@ -159,7 +163,7 @@ Status modifyLabInfo(LabInfoType infoType)
 Status displayAllLabInfo()
 {
     LabList p = labList;
-    system("cls");
+    printf("\033[H\033[J"); // 清屏
     puts("实验室地点\t实验室编号\t实验室最多人数\t实验室类型\t实验室管理员");
     while (p)
     {
@@ -171,7 +175,7 @@ Status displayAllLabInfo()
 
 Status addReservation()
 {
-    system("cls");
+    printf("\033[H\033[J"); // 清屏
     fflush(stdin);
     char buffer[MAX_SIZE] = {'\0'}, location[MAX_SIZE] = {'\0'}, labNumber[MAX_SIZE] = {'\0'};
     Date bufferDate;
@@ -518,7 +522,7 @@ Status displayAllLabReservations()
 {
     LabList p = labList;
     char date[MAX_SIZE] = {'\0'}, startTime[MAX_SIZE] = {'\0'}, endTime[MAX_SIZE] = {'\0'};
-    system("cls");
+    printf("\033[H\033[J"); // 清屏
     puts("地点\t\t编号\t预约编号\t预约日期\t起始时间\t结束时间\t预约人\t实验内容\t预约人电话");
     while (p)
     {

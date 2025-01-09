@@ -67,12 +67,13 @@ typedef struct MenuItemList
 // 菜单
 typedef struct Menu
 {
-    const char *topMenuInfo; // 顶部菜单信息
+    char **topMenuInfo; // 顶部菜单信息
     struct
     {
-        int x;        // 列
-        int y;        // 行
-    } topMenuInfoPos; // 顶部菜单信息行坐标
+        int x;           // 列
+        int y;           // 行
+    } topMenuInfoPos;    // 顶部菜单信息行坐标
+    int topMenuInfoRows; // 顶部菜单信息行数
 
     char *bottomMenuInfo; // 底部菜单信息
     struct
@@ -80,7 +81,8 @@ typedef struct Menu
         int x;           // 列
         int y;           // 行
     } bottomMenuInfoPos; // 底部菜单信息行
-
+    int bottomMenuInfoRows; // 底部菜单信息行数
+    
     MenuItemList *menuItemListHandle;      // 菜单项列表
     MenuItemHandle selectedMenuItemHandle; // 当前选中的菜单项
     char selectedMenuItemTag;              // 当前选中的菜单项标签
@@ -101,7 +103,7 @@ typedef struct
  */
 MenuItemHandle initExecFuncMenuItem(const char *name);
 MenuItemHandle initChangeMenuItem(const char *name, MenuItemType type, MenuHandle menuHandle);
-MenuHandle initMenu(void (*loop)(MenuHandle), const char *topMenuInfo, const char *bottomMenuInfo);
+MenuHandle initMenu(void (*loop)(MenuHandle), char *topMenuInfo, char *bottomMenuInfo);
 void initMenuDisplayFunctions(void (*displayMenuItem)(MenuItemHandle), void (*displaySelectedMenuItem)(MenuItemHandle), void (*moveCursor)(int, int));
 void registerMenu(MenuHandle menuHandle);
 void registerMenuItem(MenuHandle menuHandle, MenuItemHandle menuItemHandle);

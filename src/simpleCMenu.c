@@ -8,6 +8,11 @@ static MenuHandle currentMenuHandle = NULL;
 static MenuDisplayFunctions menuDisplayFunctions = {NULL, NULL, NULL};
 static time_t currentTime;
 
+void clearMenu()
+{
+    printf("\033[H\033[J"); // ÇåÆÁ
+}
+
 char getSelectedMenuItemTag()
 {
     return currentMenuHandle->selectedMenuItemHandle->tag;
@@ -48,9 +53,9 @@ void updateCurrnetMenuTime()
 void displayMenu(MenuHandle menuHandle)
 {
     MenuItem *p = menuHandle->menuItemListHandle->head;
-    system("cls");
-    printf("%s\n", menuHandle->topMenuInfo);
-    puts("===================================");
+    clearMenu();
+    for(int i = 0; i < menuHandle->topMenuInfoRows; i++)
+        printf("%s\n", menuHandle->topMenuInfo[i]);
     while (p != NULL)
     {
         if (p == menuHandle->selectedMenuItemHandle)
@@ -59,7 +64,7 @@ void displayMenu(MenuHandle menuHandle)
             menuDisplayFunctions.displayMenuItem(p);
         p = p->nextItem;
     }
-    puts("===================================");
+    puts("=======================================");
     printf("%s\n", menuHandle->bottomMenuInfo);
 }
 
@@ -75,7 +80,7 @@ void updateMenu(MenuHandle menuHandle)
             menuDisplayFunctions.displayMenuItem(p);
         p = p->nextItem;
     }
-    menuDisplayFunctions.moveCursor(menuHandle->bottomMenuInfoPos.x, menuHandle->bottomMenuInfoPos.y + 1);
+    menuDisplayFunctions.moveCursor(menuHandle->bottomMenuInfoPos.x, menuHandle->bottomMenuInfoPos.y + menuHandle->bottomMenuInfoRows);
     printf("command is [%c]\n", menuHandle->selectedMenuItemTag);
 }
 
@@ -121,7 +126,7 @@ void updateSelectedMenuItem(ChangeMenuItemAction itemAction)
 
 int isCurrentMenu(MenuHandle menuHandle)
 {
-    menuDisplayFunctions.moveCursor(currentMenuHandle->bottomMenuInfoPos.x, currentMenuHandle->bottomMenuInfoPos.y);
+    menuDisplayFunctions.moveCursor(currentMenuHandle->bottomMenuInfoPos.x, currentMenuHandle->bottomMenuInfoPos.y + currentMenuHandle->bottomMenuInfoRows - 1);
     updateCurrnetMenuTime();
     printf("%s\n", menuHandle->bottomMenuInfo);
     return currentMenuHandle == menuHandle;
@@ -211,15 +216,17 @@ void initMenuDisplayFunctions(void (*displayMenuItem)(MenuItemHandle), void (*di
     menuDisplayFunctions.moveCursor = moveCursor;
 }
 
-MenuHandle initMenu(void (*loop)(MenuHandle), const char *topMenuInfo, const char *bottomMenuInfo)
+MenuHandle initMenu(void (*loop)(MenuHandle), char *topMenuInfo, char *bottomMenuInfo)
 {
     MenuHandle menuHandle = (MenuHandle)malloc(sizeof(Menu));
     if (menuHandle == NULL)
         return NULL;
     menuHandle->topMenuInfoPos.x = 0;
-    menuHandle->topMenuInfoPos.y = 1;
+    menuHandle->topMenuInfoPos.y = 0;
+    menuHandle->topMenuInfoRows = 8;
     menuHandle->bottomMenuInfoPos.x = 0;
-    menuHandle->bottomMenuInfoPos.y = 3;
+    menuHandle->bottomMenuInfoPos.y = 8;
+    menuHandle->bottomMenuInfoRows = 2;
     menuHandle->menuItemListHandle = (MenuItemListHandle)malloc(sizeof(MenuItemList));
     menuHandle->menuItemListHandle->head = NULL;
     menuHandle->menuItemListHandle->tail = NULL;
@@ -256,7 +263,7 @@ void registerMenuItem(MenuHandle menuHandle, MenuItemHandle menuItemHandle)
     }
     menuItemHandle->tag = 'A' + menuHandle->menuItemListHandle->count;
     menuItemHandle->pos.x = 0;
-    menuItemHandle->pos.y = menuItemHandle->tag - 'A' + menuHandle->topMenuInfoPos.y + 1;
+    menuItemHandle->pos.y = menuItemHandle->tag - 'A' + menuHandle->topMenuInfoPos.y + menuHandle->topMenuInfoRows;
     menuHandle->bottomMenuInfoPos.x = 0;
     // menuHandle->bottomMenuInfoPos.y = menuItemHandle->pos.y + 1;
     menuHandle->bottomMenuInfoPos.y += 1;

@@ -6,6 +6,7 @@
 #include <windows.h>
 #include "simpleCMenu.h"
 
+extern char* topMenuInfo[];
 
 // Init menus
 void initAllMenus(MenuHandle mainMenu);

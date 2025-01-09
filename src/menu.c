@@ -1,6 +1,17 @@
 #include "menu.h"
 #include "Lab.h"
 
+char *topMenuInfo[] = {
+    "       ____   ____    _   _   _____   ",
+    "      / ___| |  _ \\  | | | | |_   _| ",
+    "     | |  _  | | | | | | | |   | |    ",
+    "     | |_| | | |_| | | |_| |   | |    ",
+    "      \\____| |____/   \\___/    |_|  ",
+    "=======================================",
+    "\t实验室预约信息管理系统",
+    "=======================================",
+};
+
 void quit()
 {
     puts("你确定要退出吗? (Y/N)");
@@ -23,7 +34,7 @@ void displayMenuItem(MenuItemHandle menuItemHandle)
 
 void displaySelectedMenuItem(MenuItemHandle menuItemHandle)
 {
-    printf("  \033[7m%s\033[0m\n", menuItemHandle->name);
+    printf("  \033[34;47m%s\033[37;44m\n", menuItemHandle->name);
 }
 
 void hideCursor()
@@ -115,22 +126,26 @@ void subMenu1Loop(MenuHandle menuHandle)
             else if (c == '\r')
             {
                 char tag = getSelectedMenuItemTag();
+                int flag;
                 switch (tag)
                 {
                 case 'A':
-                    if (addLab())
+                    flag = addLab();
+                    if (flag == OK)
                         puts("添加成功!");
-                    else
+                    else if (flag == -2)
                         puts("添加失败");
                     break;
                 case 'B':
-                    if (deleteLab())
+                    flag = deleteLab();
+                    if (flag == OK)
                         puts("删除成功!");
-                    else
+                    else if (flag == ERROR)
                         puts("删除失败,请不要删除不存在的实验室");
                     break;
                 case 'C':
-                    if (searchLabInfo())
+                    flag = searchLabInfo();
+                    if (flag == OK)
                         puts("查找成功!");
                     else
                         puts("查找失败");
