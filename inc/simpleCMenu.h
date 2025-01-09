@@ -78,11 +78,11 @@ typedef struct Menu
     char *bottomMenuInfo; // 底部菜单信息
     struct
     {
-        int x;           // 列
-        int y;           // 行
-    } bottomMenuInfoPos; // 底部菜单信息行
+        int x;              // 列
+        int y;              // 行
+    } bottomMenuInfoPos;    // 底部菜单信息行
     int bottomMenuInfoRows; // 底部菜单信息行数
-    
+
     MenuItemList *menuItemListHandle;      // 菜单项列表
     MenuItemHandle selectedMenuItemHandle; // 当前选中的菜单项
     char selectedMenuItemTag;              // 当前选中的菜单项标签

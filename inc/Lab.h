@@ -53,8 +53,8 @@ typedef struct
 {
     int reservationID;         // 预约编号,在一个实验室的所有预约中ID都是唯一的
     Date date;                 // 预约日期
-    Date startTime;            // 起始时间
-    Date endTime;              // 结束时间
+    int startTime;             // 起始时间
+    int endTime;               // 结束时间
     char personName[MAX_SIZE]; // 预约人姓名
     char content[MAX_SIZE];    // 实验内容
     char phoneNum[MAX_SIZE];   // 预约人电话
@@ -72,7 +72,7 @@ typedef struct
     LabInfo labInfo;
     LabReservationList labReservations;
     int labReservationCount[13]; // 实验室预约次数
-    int labReservationTime[13];  // 实验室使用时间,单位:天
+    int labReservationTime[13];  // 实验室使用时间,单位:节时
 } Lab, *LabPtr;                  // 实验室结构体
 
 typedef struct LabNode
@@ -129,7 +129,7 @@ Status isLabExist(Lab lab);
 // 查找指定实验室并返回其指针
 LabPtr findLab(char *location, char *number);
 // 将字符串转换为日期,用于从文件读取输入
-Status fstringToDate(char *str, Date *date); 
+Status fstringToDate(char *str, Date *date);
 Status stringToDate(char *str, Date *date);
 Status dateToString(Date date, char *str);
 Status checkReservationConflict(LabReservation *labReservation1, LabReservation *labReservation2);

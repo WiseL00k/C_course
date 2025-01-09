@@ -164,10 +164,10 @@ Status displayAllLabInfo()
 {
     LabList p = labList;
     printf("\033[H\033[J"); // 清屏
-    puts("实验室地点\t实验室编号\t实验室最多人数\t实验室类型\t实验室管理员");
+    puts("实验室地点\t实验室编号\t实验室最多人数\t\t实验室类型\t实验室管理员");
     while (p)
     {
-        printf("%s%16s%20d%12s%18s\n", p->lab.labInfo.location, p->lab.labInfo.number, p->lab.labInfo.maxCapacity, p->lab.labInfo.type, p->lab.labInfo.admin);
+        printf("%s%16s%20d%20s%18s\n", p->lab.labInfo.location, p->lab.labInfo.number, p->lab.labInfo.maxCapacity, p->lab.labInfo.type, p->lab.labInfo.admin);
         p = p->next;
     }
     return OK;
@@ -180,7 +180,7 @@ Status addReservation()
     char buffer[MAX_SIZE] = {'\0'}, location[MAX_SIZE] = {'\0'}, labNumber[MAX_SIZE] = {'\0'};
     Date bufferDate;
     LabReservation newReservation;
-    Date *allDate[2] = {&newReservation.startTime, &newReservation.endTime};
+    int *allDate[2] = {&newReservation.startTime, &newReservation.endTime};
     char *allVar[5] = {location, labNumber, newReservation.personName, newReservation.content, newReservation.phoneNum};
 
     for (int i = 0; i <= 1; ++i)
@@ -212,24 +212,27 @@ Status addReservation()
     newReservation.date.month = t->tm_mon + 1;
     newReservation.date.day = t->tm_mday;
 
-    for (int i = 0; i <= 4; ++i)
+    for (int i = 0; i <= 5; ++i)
     {
         switch (i)
         {
         case 0:
-            puts("请输入要添加预约的预约人姓名(输入q/Q返回): ");
+            puts("请输入预约人姓名(输入q/Q返回): ");
             break;
         case 1:
-            puts("请输入要添加预约的预约内容(输入q/Q返回): ");
+            puts("请输入要预约内容(输入q/Q返回): ");
             break;
         case 2:
-            puts("请输入要添加预约的预约人电话(输入q/Q返回): ");
+            puts("请输入预约人电话(输入q/Q返回): ");
             break;
         case 3:
-            puts("请输入要添加预约的起始时间: (格式: mm-dd)");
+            puts("请输入要预约的日期(格式:YYYY-MM-DD,输入q/Q返回): ");
             break;
         case 4:
-            puts("请输入要添加预约的结束时间: (格式: mm-dd)");
+            puts("请输入预约的起始时间: (节次:01-12)");
+            break;
+        case 5:
+            puts("请输入预约的结束时间: (节次:01-12)");
             break;
         }
         if (i >= 0 && i <= 2)
@@ -239,17 +242,29 @@ Status addReservation()
                 return FALSE;
             strcpy(allVar[i + 2], buffer);
         }
-        else
+        else if (i == 3)
         {
             scanf(" %s", buffer);
             if (stringToDate(buffer, &bufferDate) == OK) // 将字符串转换为日期
-                *allDate[i - 3] = bufferDate;
+                newReservation.date = bufferDate;
             else
             {
                 i--;
                 puts("输入的日期格式不正确，请重新输入");
             }
-            if (i == 4)
+        }
+        else
+        {
+            int tempTime = 0;
+            scanf(" %d", &tempTime);
+            if (tempTime >= 1 && tempTime <= 12) // 将字符串转换为日期
+                *allDate[i - 4] = tempTime;
+            else
+            {
+                i--;
+                puts("输入的时间格式不正确，请重新输入");
+            }
+            if (i == 5)
             {
                 p->labReservationCount[0]++;                              // 总预约次数加一
                 newReservation.reservationID = p->labReservationCount[0]; // 生成预约ID
@@ -258,13 +273,10 @@ Status addReservation()
                 {
                     if (checkReservationConflict(&labReserPtr->labReservation, &newReservation) == ERROR)
                     {
-                        char startTime[MAX_SIZE] = {'\0'}, endTime[MAX_SIZE] = {'\0'};
                         p->labReservationCount[0]--; // 总预约次数减一
-                        dateToString(labReserPtr->labReservation.startTime, startTime);
-                        dateToString(labReserPtr->labReservation.endTime, endTime);
                         puts("输入的时间段与已有预约冲突，请重新输入");
-                        printf("已有预约段: %s 至 %s\n", startTime, endTime);
-                        i = 2;
+                        printf("已有预约段: %02d节至 %02d节\n", labReserPtr->labReservation.startTime, labReserPtr->labReservation.endTime);
+                        i = 3;
                         break;
                     }
                     labReserPtr = labReserPtr->next;
@@ -272,8 +284,8 @@ Status addReservation()
             }
         }
     }
-    p->labReservationCount[newReservation.startTime.month]++;
-    p->labReservationTime[newReservation.startTime.month] += getReservatonUsageTime(newReservation);
+    p->labReservationCount[newReservation.date.month]++;
+    p->labReservationTime[newReservation.date.month] += getReservatonUsageTime(newReservation);
     p->labReservationTime[0] += getReservatonUsageTime(newReservation);
 
     if (p->labReservations == NULL)
@@ -302,8 +314,9 @@ Status addReservation()
 
 Status deleteReservation()
 {
+    int startTime = 0, endTime = 0;
     char buffer[MAX_SIZE] = {'\0'}, location[MAX_SIZE] = {'\0'}, labNumber[MAX_SIZE] = {'\0'};
-    char date[MAX_SIZE] = {'\0'}, startTime[MAX_SIZE] = {'\0'}, endTime[MAX_SIZE] = {'\0'};
+    char date[MAX_SIZE] = {'\0'};
     char *allVar[2] = {location, labNumber};
     for (int i = 0; i <= 1; ++i)
     {
@@ -332,10 +345,10 @@ Status deleteReservation()
     while (labReserPtr)
     {
         dateToString(labReserPtr->labReservation.date, date);
-        dateToString(labReserPtr->labReservation.startTime, startTime);
-        dateToString(labReserPtr->labReservation.endTime, endTime);
+        startTime = labReserPtr->labReservation.startTime;
+        endTime = labReserPtr->labReservation.endTime;
         LabReservation t = labReserPtr->labReservation;
-        printf("%d\t\t%s\t%s\t%s\t%s\t%s\t%s\n", t.reservationID, date, startTime, endTime, t.personName, t.content, t.phoneNum);
+        printf("%d\t\t%s\t%02d\t%02d\t%s\t%s\t%s\n", t.reservationID, date, startTime, endTime, t.personName, t.content, t.phoneNum);
         labReserPtr = labReserPtr->next;
     }
 
@@ -364,9 +377,9 @@ Status deleteReservation()
                 p->labReservations = labReserPtr->next;
             else
                 labReserPre->next = labReserPtr->next;
-            p->labReservationCount[labReserPtr->labReservation.startTime.month]--;
+            p->labReservationCount[labReserPtr->labReservation.date.month]--;
             p->labReservationCount[0]--;
-            p->labReservationTime[labReserPtr->labReservation.startTime.month] -= getReservatonUsageTime(labReserPtr->labReservation);
+            p->labReservationTime[labReserPtr->labReservation.date.month] -= getReservatonUsageTime(labReserPtr->labReservation);
             p->labReservationTime[0] -= getReservatonUsageTime(labReserPtr->labReservation);
             free(labReserPtr);
             break;
@@ -379,8 +392,9 @@ Status deleteReservation()
 
 Status searchReservation()
 {
+    int startTime = 0, endTime = 0;
     char buffer[MAX_SIZE] = {'\0'}, location[MAX_SIZE] = {'\0'}, labNumber[MAX_SIZE] = {'\0'};
-    char date[MAX_SIZE] = {'\0'}, startTime[MAX_SIZE] = {'\0'}, endTime[MAX_SIZE] = {'\0'};
+    char date[MAX_SIZE] = {'\0'};
     char *allVar[2] = {location, labNumber};
     for (int i = 0; i <= 1; ++i)
     {
@@ -408,9 +422,9 @@ Status searchReservation()
     while (labReserPtr)
     {
         dateToString(labReserPtr->labReservation.date, date);
-        dateToString(labReserPtr->labReservation.startTime, startTime);
-        dateToString(labReserPtr->labReservation.endTime, endTime);
-        printf("%d\t\t%s\t%s\t%s\t%s\t%s\t%s\n", labReserPtr->labReservation.reservationID, date, startTime, endTime, labReserPtr->labReservation.personName, labReserPtr->labReservation.content, labReserPtr->labReservation.phoneNum);
+        startTime = labReserPtr->labReservation.startTime;
+        endTime = labReserPtr->labReservation.endTime;
+        printf("%d\t\t%s\t%02d\t%02d\t%s\t%s\t%s\n", labReserPtr->labReservation.reservationID, date, startTime, endTime, labReserPtr->labReservation.personName, labReserPtr->labReservation.content, labReserPtr->labReservation.phoneNum);
         labReserPtr = labReserPtr->next;
     }
     return OK;
@@ -418,8 +432,9 @@ Status searchReservation()
 
 Status modifyReservation(ReservationInfoType infoType)
 {
+    int startTime = 0, endTime = 0;
     char buffer[MAX_SIZE] = {'\0'}, location[MAX_SIZE] = {'\0'}, labNumber[MAX_SIZE] = {'\0'};
-    char date[MAX_SIZE] = {'\0'}, startTime[MAX_SIZE] = {'\0'}, endTime[MAX_SIZE] = {'\0'};
+    char date[MAX_SIZE] = {'\0'};
     char *allVar[2] = {location, labNumber};
     for (int i = 0; i <= 1; ++i)
     {
@@ -451,9 +466,9 @@ Status modifyReservation(ReservationInfoType infoType)
     while (labReserPtr)
     {
         dateToString(labReserPtr->labReservation.date, date);
-        dateToString(labReserPtr->labReservation.startTime, startTime);
-        dateToString(labReserPtr->labReservation.endTime, endTime);
-        printf("%d\t\t%s\t%s\t%s\t%s\t%s\t%s\n", labReserPtr->labReservation.reservationID, date, startTime, endTime, labReserPtr->labReservation.personName, labReserPtr->labReservation.content, labReserPtr->labReservation.phoneNum);
+        startTime = labReserPtr->labReservation.startTime;
+        endTime = labReserPtr->labReservation.endTime;
+        printf("%d\t\t%s\t%02d\t%02d\t%s\t%s\t%s\n", labReserPtr->labReservation.reservationID, date, startTime, endTime, labReserPtr->labReservation.personName, labReserPtr->labReservation.content, labReserPtr->labReservation.phoneNum);
         labReserPtr = labReserPtr->next;
     }
     int reservationID;
@@ -484,22 +499,24 @@ Status modifyReservation(ReservationInfoType infoType)
         switch (infoType)
         {
         case STARTTIME:
-            puts("请输入新的起始时间(格式: MM-DD): ");
-            scanf(" %s", startTime);
-            if (stringToDate(startTime, &labReserPtr->labReservation.startTime) != OK)
+            puts("请输入新的起始时间(节次：01-12): ");
+            scanf(" %d", &startTime);
+            if (startTime <= 0 || startTime > 12 || startTime > labReserPtr->labReservation.endTime)
             {
-                puts("输入的日期格式不正确,请重试!");
+                puts("输入的时间格式不正确,请重试!");
                 continue;
             }
+            labReserPtr->labReservation.startTime = startTime;
             break;
         case ENDTIME:
-            puts("请输入新的结束时间(格式: MM-DD): ");
-            scanf(" %s", endTime);
-            if (stringToDate(endTime, &labReserPtr->labReservation.endTime) != OK)
+            puts("请输入新的结束时间(节次：01-12): ");
+            scanf(" %d", &endTime);
+            if (endTime <= 0 || endTime > 12 || endTime < labReserPtr->labReservation.startTime)
             {
-                puts("输入的日期格式不正确,请重试!");
+                puts("输入的时间格式不正确,请重试!");
                 continue;
             }
+            labReserPtr->labReservation.endTime = endTime;
             break;
         case PERSONNAME:
             puts("请输入新的预约人姓名: ");
@@ -521,7 +538,8 @@ Status modifyReservation(ReservationInfoType infoType)
 Status displayAllLabReservations()
 {
     LabList p = labList;
-    char date[MAX_SIZE] = {'\0'}, startTime[MAX_SIZE] = {'\0'}, endTime[MAX_SIZE] = {'\0'};
+    int startTime = 0, endTime = 0;
+    char date[MAX_SIZE] = {'\0'};
     printf("\033[H\033[J"); // 清屏
     puts("地点\t\t编号\t预约编号\t预约日期\t起始时间\t结束时间\t预约人\t实验内容\t预约人电话");
     while (p)
@@ -530,9 +548,9 @@ Status displayAllLabReservations()
         while (labReserPtr)
         {
             dateToString(labReserPtr->labReservation.date, date);
-            dateToString(labReserPtr->labReservation.startTime, startTime);
-            dateToString(labReserPtr->labReservation.endTime, endTime);
-            printf("%s\t%s\t%d\t\t%s\t%s\t%s\t%s\t%s\t%s\n", p->lab.labInfo.location, p->lab.labInfo.number, labReserPtr->labReservation.reservationID, date, startTime, endTime, labReserPtr->labReservation.personName, labReserPtr->labReservation.content, labReserPtr->labReservation.phoneNum);
+            startTime = labReserPtr->labReservation.startTime;
+            endTime = labReserPtr->labReservation.endTime;
+            printf("%s\t%s\t%d\t\t%s\t%02d\t\t%02d\t\t%s\t%s\t%s\n", p->lab.labInfo.location, p->lab.labInfo.number, labReserPtr->labReservation.reservationID, date, startTime, endTime, labReserPtr->labReservation.personName, labReserPtr->labReservation.content, labReserPtr->labReservation.phoneNum);
             labReserPtr = labReserPtr->next;
         }
         p = p->next;
@@ -550,7 +568,7 @@ Status calculateAllLabSituation(StatiType statiType)
         int month = 0;
         month = getMonthInput();
         printf("%d月全部实验室的预约情况如下: \n", month);
-        puts("地点\t\t编号\t预约次数\t使用天数");
+        puts("地点\t\t编号\t预约次数\t使用节时");
         LabList p = labList;
         while (p)
         {
@@ -561,7 +579,7 @@ Status calculateAllLabSituation(StatiType statiType)
     }
     case YEARLY:
         printf("今年全部实验室的预约情况如下: \n");
-        puts("地点\t\t编号\t预约次数\t使用天数");
+        puts("地点\t\t编号\t预约次数\t使用节时");
         LabList p = labList;
         while (p)
         {
@@ -577,7 +595,7 @@ Status calculateAllLabSituation(StatiType statiType)
 Status calculatePersonUsageTime(StatiType statiType)
 {
     char name[MAX_SIZE] = {'\0'};
-    int month = 0;
+    int month = 0, startTime = 0, endTime = 0;
     puts("请输入要查询的预约人姓名: ");
     fflush(stdin);
     scanf(" %s", name);
@@ -599,15 +617,15 @@ Status calculatePersonUsageTime(StatiType statiType)
             if (strcmp(labReserPtr->labReservation.personName, name) == 0)
             {
                 int usageTime = getReservatonUsageTime(labReserPtr->labReservation);
-                char startTime[MAX_SIZE] = {'\0'}, endTime[MAX_SIZE] = {'\0'}, date[MAX_SIZE] = {'\0'};
+                char date[MAX_SIZE] = {'\0'};
                 dateToString(labReserPtr->labReservation.date, date);
-                dateToString(labReserPtr->labReservation.startTime, startTime);
-                dateToString(labReserPtr->labReservation.endTime, endTime);
+                startTime = labReserPtr->labReservation.startTime;
+                endTime = labReserPtr->labReservation.endTime;
                 if (statiType == MONTHLY)
                 {
                     if (labReserPtr->labReservation.date.month == month)
                     {
-                        printf("%s\t%s\t\t%s\t%s\t%s\t%s\t\t%d天\n",
+                        printf("%s\t%s\t\t%s\t%02d\t%02d\t%s\t\t%d天\n",
                                date,
                                tmpLab.labInfo.location,
                                tmpLab.labInfo.number,
@@ -621,7 +639,7 @@ Status calculatePersonUsageTime(StatiType statiType)
                 }
                 else
                 {
-                    printf("%s\t%s\t%s\t\t%s\t%s\t%s\t\t%d天\n",
+                    printf("%s\t%s\t\t%s\t%02d\t%02d\t%s\t\t%d天\n",
                            date,
                            tmpLab.labInfo.location,
                            tmpLab.labInfo.number,
@@ -640,9 +658,9 @@ Status calculatePersonUsageTime(StatiType statiType)
     if (totalCount != 0)
     {
         if (statiType == MONTHLY)
-            printf("%d月份%s的预约实验总时间为: %d 天, 预约总次数为%d \n", month, name, totalUsageTime, totalCount);
+            printf("%d月份%s的预约实验总时间为: %d 节时, 预约总次数为%d \n", month, name, totalUsageTime, totalCount);
         else
-            printf("今年%s的预约实验总时间为: %d 天, 预约总次数为%d \n", name, totalUsageTime, totalCount);
+            printf("今年%s的预约实验总时间为: %d 节时, 预约总次数为%d \n", name, totalUsageTime, totalCount);
     }
     else
         printf("\n%s没有预约实验记录\n", name);
@@ -652,9 +670,9 @@ Status calculatePersonUsageTime(StatiType statiType)
 Status calculateLabUsageSituation(StatiType statiType)
 {
     char buffer[MAX_SIZE] = {'\0'}, location[MAX_SIZE] = {'\0'}, labNumber[MAX_SIZE] = {'\0'};
-    char date[MAX_SIZE] = {'\0'}, startTime[MAX_SIZE] = {'\0'}, endTime[MAX_SIZE] = {'\0'};
+    char date[MAX_SIZE] = {'\0'};
     char *allVar[2] = {location, labNumber};
-    int month = 0, totalUsageTime = 0, totalCount = 0;
+    int month = 0, totalUsageTime = 0, totalCount = 0, startTime = 0, endTime = 0;
     for (int i = 0; i <= 1; ++i)
     {
         switch (i)
@@ -688,13 +706,13 @@ Status calculateLabUsageSituation(StatiType statiType)
     {
         int usageTime = getReservatonUsageTime(labReserPtr->labReservation);
         dateToString(labReserPtr->labReservation.date, date);
-        dateToString(labReserPtr->labReservation.startTime, startTime);
-        dateToString(labReserPtr->labReservation.endTime, endTime);
+        startTime = labReserPtr->labReservation.startTime;
+        endTime = labReserPtr->labReservation.endTime;
         if (statiType == MONTHLY)
         {
             if (labReserPtr->labReservation.date.month == month)
             {
-                printf("%d\t\t%s\t%s\t%s\t%d天\n",
+                printf("%d\t\t%s\t%02d\t%02d\t%d天\n",
                        labReserPtr->labReservation.reservationID,
                        date,
                        startTime,
@@ -706,7 +724,7 @@ Status calculateLabUsageSituation(StatiType statiType)
         }
         else
         {
-            printf("%d\t\t%s\t%s\t%s\t%d天\n",
+            printf("%d\t\t%s\t%02d\t%02d\t%d天\n",
                    labReserPtr->labReservation.reservationID,
                    date,
                    startTime,
@@ -720,9 +738,9 @@ Status calculateLabUsageSituation(StatiType statiType)
     if (totalCount != 0)
     {
         if (statiType == MONTHLY)
-            printf("%d月份%s%s的预约实验总时间为: %d 天, 预约总次数为%d \n", month, p->labInfo.location, p->labInfo.number, totalUsageTime, totalCount);
+            printf("%d月份%s%s的预约实验总时间为: %d 节时, 预约总次数为%d \n", month, p->labInfo.location, p->labInfo.number, totalUsageTime, totalCount);
         else
-            printf("今年%s%s的预约实验总时间为: %d 天, 预约总次数为%d \n", p->labInfo.location, p->labInfo.number, totalUsageTime, totalCount);
+            printf("今年%s%s的预约实验总时间为: %d 节时, 预约总次数为%d \n", p->labInfo.location, p->labInfo.number, totalUsageTime, totalCount);
     }
     else
         printf("%s%s没有预约实验记录!\n", p->labInfo.location, p->labInfo.number);
@@ -785,7 +803,8 @@ Status loadLabInfo()
 
 Status saveLabReservations()
 {
-    char date[MAX_SIZE] = {'\0'}, startTime[MAX_SIZE] = {'\0'}, endTime[MAX_SIZE] = {'\0'};
+    int startTime = 0, endTime = 0;
+    char date[MAX_SIZE] = {'\0'};
     FILE *fp = fopen("./reservation.txt", "w");
     if (fp == NULL)
     {
@@ -799,9 +818,9 @@ Status saveLabReservations()
         while (labReserPtr)
         {
             dateToString(labReserPtr->labReservation.date, date);
-            dateToString(labReserPtr->labReservation.startTime, startTime);
-            dateToString(labReserPtr->labReservation.endTime, endTime);
-            fprintf(fp, "%s %s %s %s %s %s %s %s\n", p->lab.labInfo.location, p->lab.labInfo.number, date, startTime, endTime, labReserPtr->labReservation.personName, labReserPtr->labReservation.content, labReserPtr->labReservation.phoneNum);
+            startTime = labReserPtr->labReservation.startTime;
+            endTime = labReserPtr->labReservation.endTime;
+            fprintf(fp, "%s %s %s %02d %02d %s %s %s\n", p->lab.labInfo.location, p->lab.labInfo.number, date, startTime, endTime, labReserPtr->labReservation.personName, labReserPtr->labReservation.content, labReserPtr->labReservation.phoneNum);
             labReserPtr = labReserPtr->next;
         }
         p = p->next;
@@ -818,24 +837,24 @@ Status loadLabReservations()
         puts("文件打开失败");
         return ERROR;
     }
-    char location[MAX_SIZE] = {'\0'}, labNumber[MAX_SIZE] = {'\0'}, date[MAX_SIZE] = {'\0'}, startTime[MAX_SIZE] = {'\0'}, endTime[MAX_SIZE] = {'\0'}, personName[MAX_SIZE] = {'\0'};
+    char location[MAX_SIZE] = {'\0'}, labNumber[MAX_SIZE] = {'\0'}, date[MAX_SIZE] = {'\0'}, personName[MAX_SIZE] = {'\0'};
+    int startTime = 0, endTime = 0;
     LabReservation newReservation;
     while (fscanf(fp, "%s %s", location, labNumber) != EOF)
     {
         LabPtr p = findLab(location, labNumber);
         if (!p)
             return -2;
-        fscanf(fp, "%s %s %s %s %s %s", date, startTime, endTime, newReservation.personName, newReservation.content, newReservation.phoneNum);
+        fscanf(fp, "%s %02d %02d %s %s %s", date, &startTime, &endTime, newReservation.personName, newReservation.content, newReservation.phoneNum);
         newReservation.reservationID = 0;
 
         fstringToDate(date, &newReservation.date);
-        fstringToDate(startTime, &newReservation.startTime);
-        fstringToDate(endTime, &newReservation.endTime);
-
+        newReservation.startTime = startTime;
+        newReservation.endTime = endTime;
         strcpy(newReservation.roomNum, p->labInfo.number);
         p->labReservationCount[0]++;
-        p->labReservationCount[newReservation.startTime.month]++;
-        p->labReservationTime[newReservation.startTime.month] += getReservatonUsageTime(newReservation);
+        p->labReservationCount[newReservation.date.month]++;
+        p->labReservationTime[newReservation.date.month] += getReservatonUsageTime(newReservation);
         p->labReservationTime[0] += getReservatonUsageTime(newReservation);
 
         newReservation.reservationID = p->labReservationCount[0];
@@ -917,10 +936,10 @@ Status checkReservationConflict(LabReservation *labReservation1, LabReservation 
     // 不同实验室的预约,没有冲突
     if (labReservation1->reservationID == labReservation2->reservationID || strcmp(labReservation1->roomNum, labReservation2->roomNum) != 0)
         return OK;
-    int labReservation1StartTime = labReservation1->startTime.month * monthDays[labReservation1->startTime.month] + labReservation1->startTime.day;
-    int labReservation1EndTime = labReservation1->endTime.month * monthDays[labReservation1->endTime.month] + labReservation1->endTime.day;
-    int labReservation2StartTime = labReservation2->startTime.month * monthDays[labReservation2->startTime.month] + labReservation2->startTime.day;
-    int labReservation2EndTime = labReservation2->endTime.month * monthDays[labReservation2->endTime.month] + labReservation2->endTime.day;
+    int labReservation1StartTime = labReservation1->startTime;
+    int labReservation1EndTime = labReservation1->endTime;
+    int labReservation2StartTime = labReservation2->startTime;
+    int labReservation2EndTime = labReservation2->endTime;
     if ((labReservation2StartTime <= labReservation1StartTime && labReservation2EndTime >= labReservation1StartTime) ||
         (labReservation2StartTime >= labReservation1StartTime && labReservation2EndTime <= labReservation1EndTime) ||
         (labReservation2StartTime <= labReservation1EndTime && labReservation2EndTime >= labReservation1EndTime))
@@ -930,8 +949,8 @@ Status checkReservationConflict(LabReservation *labReservation1, LabReservation 
 
 int getReservatonUsageTime(LabReservation reservation)
 {
-    // 加1是因为要包含结束时间
-    return 1 + reservation.endTime.month * monthDays[reservation.endTime.month] + reservation.endTime.day - reservation.startTime.month * monthDays[reservation.startTime.month] - reservation.startTime.day;
+    // 返回预约使用时间
+    return reservation.endTime - reservation.startTime;
 }
 
 int getMonthInput()

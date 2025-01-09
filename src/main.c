@@ -12,7 +12,7 @@ int main(void)
     MenuHandle mainMenu = initMenu(mainMenuLoop, topMenuInfo, bottomMenuInfo);
     initAllMenus(mainMenu);
 
-    login();
+    // login();
 
     loadLabInfo();
     loadLabReservations();
