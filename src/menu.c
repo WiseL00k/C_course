@@ -29,13 +29,13 @@ void goToxy(int x, int y)
 
 void displayMenuItem(MenuItemHandle menuItemHandle)
 {
-    printf("%s  \n", menuItemHandle->name);
+    printf("\t   %s  \n", menuItemHandle->name);
 }
 
 void displaySelectedMenuItem(MenuItemHandle menuItemHandle)
 {
-    // printf("  \033[34;47m%s\033[37;44m\n", menuItemHandle->name);
-    printf("  \033[7m%s\033[0m\n", menuItemHandle->name);
+    // printf("\t  \033[34;47m%s\033[37;44m\n", menuItemHandle->name);
+    printf("\t     \033[7m%s\033[0m\n", menuItemHandle->name);
 }
 
 void hideCursor()
