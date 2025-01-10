@@ -541,7 +541,7 @@ Status displayAllLabReservations()
     int startTime = 0, endTime = 0;
     char date[MAX_SIZE] = {'\0'};
     printf("\033[H\033[J"); // 清屏
-    puts("地点\t\t编号\t预约编号\t预约日期\t起始时间\t结束时间\t预约人\t实验内容\t预约人电话");
+    puts("地点\t\t编号\t预约编号\t预约日期\t起始时间\t结束时间\t预约人\t实验内容\t\t预约人电话");
     while (p)
     {
         LabReservationNode *labReserPtr = p->lab.labReservations;
@@ -550,7 +550,7 @@ Status displayAllLabReservations()
             dateToString(labReserPtr->labReservation.date, date);
             startTime = labReserPtr->labReservation.startTime;
             endTime = labReserPtr->labReservation.endTime;
-            printf("%s\t%s\t%d\t\t%s\t%02d\t\t%02d\t\t%s\t%s\t%s\n", p->lab.labInfo.location, p->lab.labInfo.number, labReserPtr->labReservation.reservationID, date, startTime, endTime, labReserPtr->labReservation.personName, labReserPtr->labReservation.content, labReserPtr->labReservation.phoneNum);
+            printf("%s\t%s\t%d\t\t%s\t%02d\t\t%02d\t\t%s\t%s\t\t%s\n", p->lab.labInfo.location, p->lab.labInfo.number, labReserPtr->labReservation.reservationID, date, startTime, endTime, labReserPtr->labReservation.personName, labReserPtr->labReservation.content, labReserPtr->labReservation.phoneNum);
             labReserPtr = labReserPtr->next;
         }
         p = p->next;
@@ -567,9 +567,35 @@ Status calculateAllLabSituation(StatiType statiType)
     {
         int month = 0;
         month = getMonthInput();
-        printf("%d月全部实验室的预约情况如下: \n", month);
+        printf("%d月全部实验室的预约情况(按时间降序排列)如下: \n", month);
         puts("地点\t\t编号\t预约次数\t使用节时");
-        LabList p = labList;
+
+        LabList sortedLabList = (LabList)malloc(sizeof(LabNode));
+        sortedLabList->next = NULL;
+        LabList p = labList, q = NULL, minptr = labList, minqtr = NULL, temp = p;
+        while (labList)
+        {
+            p = labList, q = NULL, minptr = labList, minqtr = NULL;
+            while (p)
+            {
+                if (p->lab.labReservationTime[month] < minptr->lab.labReservationTime[month])
+                {
+                    minqtr = q;
+                    minptr = p;
+                }
+                q = p;
+                p = p->next;
+            }
+            if (minqtr)
+                minqtr->next = minptr->next;
+            else
+                labList = minptr->next;
+            minptr->next = sortedLabList->next;
+            sortedLabList->next = minptr;
+        }
+
+        labList = sortedLabList->next;
+        p = labList;
         while (p)
         {
             printf("%s\t%s\t%7d\t\t%7d\n", p->lab.labInfo.location, p->lab.labInfo.number, p->lab.labReservationCount[month], p->lab.labReservationTime[month]);
@@ -578,9 +604,36 @@ Status calculateAllLabSituation(StatiType statiType)
         break;
     }
     case YEARLY:
-        printf("今年全部实验室的预约情况如下: \n");
+        printf("今年全部实验室的预约情况(按时间降序排列)如下: \n");
         puts("地点\t\t编号\t预约次数\t使用节时");
-        LabList p = labList;
+
+        LabList sortedLabList = (LabList)malloc(sizeof(LabNode));
+        sortedLabList->next = NULL;
+        LabList p = labList, q = NULL, minptr = labList, minqtr = NULL, temp = p;
+        while (labList)
+        {
+            p = labList, q = NULL, minptr = labList, minqtr = NULL;
+            while (p)
+            {
+                if (p->lab.labReservationTime[0] < minptr->lab.labReservationTime[0])
+                {
+                    minqtr = q;
+                    minptr = p;
+                }
+                q = p;
+                p = p->next;
+            }
+            if (minqtr)
+                minqtr->next = minptr->next;
+            else
+                labList = minptr->next;
+            minptr->next = sortedLabList->next;
+            sortedLabList->next = minptr;
+        }
+
+        labList = sortedLabList->next;
+        p = labList;
+
         while (p)
         {
             printf("%s\t%s\t%7d\t\t%7d\n", p->lab.labInfo.location, p->lab.labInfo.number, p->lab.labReservationCount[0], p->lab.labReservationTime[0]);
@@ -625,7 +678,7 @@ Status calculatePersonUsageTime(StatiType statiType)
                 {
                     if (labReserPtr->labReservation.date.month == month)
                     {
-                        printf("%s\t%s\t\t%s\t%02d\t%02d\t%s\t\t%d天\n",
+                        printf("%s\t%s\t%s\t\t%02d\t\t%02d\t\t%s\t%d节\n",
                                date,
                                tmpLab.labInfo.location,
                                tmpLab.labInfo.number,
@@ -639,7 +692,7 @@ Status calculatePersonUsageTime(StatiType statiType)
                 }
                 else
                 {
-                    printf("%s\t%s\t\t%s\t%02d\t%02d\t%s\t\t%d天\n",
+                    printf("%s\t%s\t%s\t\t%02d\t\t%02d\t\t%s\t%d节\n",
                            date,
                            tmpLab.labInfo.location,
                            tmpLab.labInfo.number,
@@ -663,7 +716,10 @@ Status calculatePersonUsageTime(StatiType statiType)
             printf("今年%s的预约实验总时间为: %d 节时, 预约总次数为%d \n", name, totalUsageTime, totalCount);
     }
     else
+    {
+        printf("\033[H\033[J"); // 清屏
         printf("\n%s没有预约实验记录\n", name);
+    }
     return OK;
 }
 
@@ -712,7 +768,7 @@ Status calculateLabUsageSituation(StatiType statiType)
         {
             if (labReserPtr->labReservation.date.month == month)
             {
-                printf("%d\t\t%s\t%02d\t%02d\t%d天\n",
+                printf("%d\t\t%s\t%02d\t\t%02d\t\t%d节\n",
                        labReserPtr->labReservation.reservationID,
                        date,
                        startTime,
@@ -724,7 +780,7 @@ Status calculateLabUsageSituation(StatiType statiType)
         }
         else
         {
-            printf("%d\t\t%s\t%02d\t%02d\t%d天\n",
+            printf("%d\t\t%s\t%02d\t\t%02d\t\t%d节\n",
                    labReserPtr->labReservation.reservationID,
                    date,
                    startTime,
@@ -743,7 +799,10 @@ Status calculateLabUsageSituation(StatiType statiType)
             printf("今年%s%s的预约实验总时间为: %d 节时, 预约总次数为%d \n", p->labInfo.location, p->labInfo.number, totalUsageTime, totalCount);
     }
     else
+    {
+        printf("\033[H\033[J"); // 清屏
         printf("%s%s没有预约实验记录!\n", p->labInfo.location, p->labInfo.number);
+    }
     return OK;
 }
 
@@ -845,6 +904,7 @@ Status loadLabReservations()
         LabPtr p = findLab(location, labNumber);
         if (!p)
             return -2;
+        // 读取预约信息
         fscanf(fp, "%s %02d %02d %s %s %s", date, &startTime, &endTime, newReservation.personName, newReservation.content, newReservation.phoneNum);
         newReservation.reservationID = 0;
 

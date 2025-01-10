@@ -17,7 +17,7 @@ int main(void)
     loadLabInfo();
     loadLabReservations();
     
-    printf("\033[37;44m");
+    // printf("\033[37;44m");
     runMainMenu(mainMenu);
 
     return 0;
