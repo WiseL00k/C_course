@@ -105,11 +105,15 @@ Status searchLabInfo()
     {
         if (strcmp(p->lab.labInfo.location, location) == 0 && strcmp(p->lab.labInfo.number, number) == 0)
         {
+            puts("==========================================");
+            puts("实验室信息如下: ");
+            puts("==========================================");
             printf("\n实验室地点: %s\n", p->lab.labInfo.location);
             printf("实验室编号: %s\n", p->lab.labInfo.number);
             printf("实验室最多人数: %d\n", p->lab.labInfo.maxCapacity);
             printf("实验室类型: %s\n", p->lab.labInfo.type);
             printf("实验室管理员: %s\n\n", p->lab.labInfo.admin);
+            puts("==========================================");
             return OK;
         }
         p = p->next;
@@ -229,7 +233,7 @@ Status addReservation()
             puts("请输入预约人电话(输入q/Q返回): ");
             break;
         case 3:
-            puts("请输入要预约的日期(格式:YYYY-MM-DD,输入q/Q返回): ");
+            puts("请输入要预约的日期(格式:MM-DD,输入q/Q返回): ");
             break;
         case 4:
             puts("请输入预约的起始时间: (节次:01-12)");
@@ -423,18 +427,18 @@ Status searchReservation()
         return -2; // 没有找到实验室
     LabReservationNode *labReserPtr = p->labReservations;
     printf("%s的%s实验室预约信息如下: \n", p->labInfo.location, p->labInfo.number);
-    puts("=====================================================================================================================");
+    puts("=================================================================================================================");
     puts("预约编号\t预约日期\t起始时间\t结束时间\t预约人\t实验内容\t预约人电话");
-    puts("=====================================================================================================================");
+    puts("=================================================================================================================");
     while (labReserPtr)
     {
         dateToString(labReserPtr->labReservation.date, date);
         startTime = labReserPtr->labReservation.startTime;
         endTime = labReserPtr->labReservation.endTime;
-        printf("%d\t\t%s\t%02d\t%02d\t%s\t%s\t%s\n", labReserPtr->labReservation.reservationID, date, startTime, endTime, labReserPtr->labReservation.personName, labReserPtr->labReservation.content, labReserPtr->labReservation.phoneNum);
+        printf("%d\t\t%s\t%02d\t\t%02d\t\t%s\t%s\t%s\n", labReserPtr->labReservation.reservationID, date, startTime, endTime, labReserPtr->labReservation.personName, labReserPtr->labReservation.content, labReserPtr->labReservation.phoneNum);
         labReserPtr = labReserPtr->next;
     }
-    puts("=====================================================================================================================");
+    puts("=================================================================================================================");
     return OK;
 }
 

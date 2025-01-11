@@ -34,8 +34,9 @@ void displayMenuItem(MenuItemHandle menuItemHandle)
 
 void displaySelectedMenuItem(MenuItemHandle menuItemHandle)
 {
-    printf("\t  \033[34;47m%s\033[37;44m\n", menuItemHandle->name);
-    // printf("\t     \033[7m%s\033[0m\n", menuItemHandle->name);
+    // ÂÌÉ«Ö÷Ìâ
+    // printf("\t     \033[32;40m%s\033[30;42m\n", menuItemHandle->name);
+    printf("\t     \033[7m%s\033[0m\n", menuItemHandle->name);
 }
 
 void hideCursor()
