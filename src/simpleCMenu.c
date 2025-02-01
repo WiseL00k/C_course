@@ -216,7 +216,7 @@ void initMenuDisplayFunctions(void (*displayMenuItem)(MenuItemHandle), void (*di
     menuDisplayFunctions.moveCursor = moveCursor;
 }
 
-MenuHandle initMenu(void (*loop)(MenuHandle), char *topMenuInfo, char *bottomMenuInfo)
+MenuHandle initMenu(void (*loop)(MenuHandle), char **topMenuInfo, char *bottomMenuInfo)
 {
     MenuHandle menuHandle = (MenuHandle)malloc(sizeof(Menu));
     if (menuHandle == NULL)

@@ -103,7 +103,7 @@ typedef struct
  */
 MenuItemHandle initExecFuncMenuItem(const char *name);
 MenuItemHandle initChangeMenuItem(const char *name, MenuItemType type, MenuHandle menuHandle);
-MenuHandle initMenu(void (*loop)(MenuHandle), char *topMenuInfo, char *bottomMenuInfo);
+MenuHandle initMenu(void (*loop)(MenuHandle), char **topMenuInfo, char *bottomMenuInfo);
 void initMenuDisplayFunctions(void (*displayMenuItem)(MenuItemHandle), void (*displaySelectedMenuItem)(MenuItemHandle), void (*moveCursor)(int, int));
 void registerMenu(MenuHandle menuHandle);
 void registerMenuItem(MenuHandle menuHandle, MenuItemHandle menuItemHandle);
